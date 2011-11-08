@@ -1,0 +1,31 @@
+1.2.1 (2011-10-11)
+---
+Improved documentation
+Added missing library
+Updated httpclient library to fix SSL issue
+Other minor fixes and improvements
+
+1.2 (2011-08-16)
+---
+Added README
+Added CHANGELOG
+Added a session type to simplify web OAuth flow
+ - This means you don't need to (and should not) ask for user credentials
+Enormous refactoring
+ - Most classes changed
+ - Most function signatures changed
+ - Removed config files and moved all config to the Session object
+ - Should be much easier to use now
+ - File upload methods now take an InputStream instead of File for more flexibility
+ - Fixed bugs
+Updated and added more Javadoc
+Added finely-tuned connection reuse and pooling
+Removed dependency on the signpost libraries
+Added new v1 API calls and rev parameter to old calls
+ - Revisions, search, restore, media, share
+Removed non-v1 API calls
+Changed how the SDK is packaged
+ - Includes source code (for Javadoc)
+ - Includes JAR dependencies and their licenses
+ - Includes Dropbox SDK license, readme, and changelog
+
