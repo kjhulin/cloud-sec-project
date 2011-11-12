@@ -1,3 +1,4 @@
+package crypto;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,8 +26,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-//TODO - Javadoc comments
-
+/**
+ * Class: Crypto.java - Cryptography for files and keywords
+ * Author: Donald Talkington - dst071000@utdallas.edu
+ * Project: Dropbox API with Symmetric Searchable Encryption
+ * Date: November 11th, 2011
+ * Version: 1.0
+ * @author dtalk
+ */
 public class Crypto
 {
 	private final static int BIT_SIZE = 8;
@@ -39,12 +46,21 @@ public class Crypto
 	private final static String HMAC_MODE = "HmacSHA256";
 	private final static int AES_KEY_SIZE = 128;
 	private final static String AES_CIPHER_MODE = "AES/CTR/NoPadding";
-	
 	private final static String EXT = ".SSE2";
 	private final static String TEMP = ".TEMP";
 	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
 	
-	// Encrypt AES FILE - COMPLETE
+	/**
+	 * Crypto fileAESenc method - encrypts file
+	 * If destination file exists HMAC verification occurs.
+	 * If successful the file is truncated, and AES password based encryption is then applied to the source file.
+	 * After encryption the HMAC is calculated and appended to the file by calling the appendHMAC method.
+	 * @param src File object to be encrypted
+	 * @param dest File object to write encrypted contents to
+	 * @param pass Character array that contains password used for password based encryption
+	 * @param delete Boolean flag for indicating of the src File should be deleted on completion
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions, Cryptography library exceptions
+	 */
 	public static void fileAESenc(File src, File dest, final char[] pass, final boolean delete) throws AlertException
 	{
 		RandomAccessFile file;
@@ -69,7 +85,6 @@ public class Crypto
 		
 		final byte[] fKey = generateBytes(SALT_SIZE);
 		final byte[] fIV = generateBytes(IV_SIZE);
-		
 		final byte[] secret = keygen(pass.clone(), fKey, AES_KEY_SIZE);
 		SecretKeySpec keySpec = new SecretKeySpec(secret, "AES");
 		Arrays.fill(secret, (byte) 0x00);
@@ -119,7 +134,17 @@ public class Crypto
 		}
 	}
 	
-	// DECRYPT AES FILE - COMPLETE
+	/**
+	 * Crypto fileAESdec method - decrypts file
+	 * Firstly HMAC verification occurs.
+	 * If successful the source file is parsed for necessary information.
+	 * Then if the destination file exists it is deleted.
+	 * Finally AES password based decryption is applied to the source document.
+	 * @param src File object to be decrypted
+	 * @param dest File object to write decrypted contents to
+	 * @param pass Character array that contains password used for password based encryption
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions, Cryptography library exceptions
+	 */
 	public static void fileAESdec(File src, File dest, final char[] pass) throws AlertException
 	{
 		if(!verifyHMAC(src, pass.clone()))
@@ -186,7 +211,14 @@ public class Crypto
 		{throw new AlertException("fileAESdec: unable to decrypt source to destination");}
 	}
 	
-	// GENERATE PASSWORD BASED SECRET KEY - COMPLETE
+	/**
+	 * Crypto keygen method - generates secret key based on password
+	 * @param pass Character array that contains password used for password based encryption
+	 * @param salt Byte array that contains salt used for password based encryption
+	 * @param size Integer that indications the size of the key that should be generated (max 256 bit)
+	 * @return Byte array that contains secret key based on password
+	 * @throws AlertException Thrown for Cryptography library exceptions
+	 */
 	public static final byte[] keygen(final char[] pass, final byte[] salt, final int size) throws AlertException
 	{
 		final int len = Math.abs(size / BIT_SIZE);
@@ -216,7 +248,15 @@ public class Crypto
 		return result;
 	}
 	
-	// APPEND HMAC TO FILE - COMPLETE
+	/**
+	 * Crypto appendHMAC method - calculates and appends HMAC to encrypted file
+	 * Generates secret key using provided password.
+	 * Then the HMAC is calculated using the encrypted file contents.
+	 * Finally the HMAC is appended to the encrypted file.
+	 * @param src File object that contains encrypted contents
+	 * @param pass Character array that contains password used for password based encryption
+	 * @throws AlertException Thrown for IOExceptions, Cryptography library exceptions
+	 */
 	private static void appendHMAC(File src, final char[] pass) throws AlertException
 	{
 		final byte[] salt = generateBytes(SALT_SIZE);
@@ -270,7 +310,16 @@ public class Crypto
 		{throw new AlertException("appendHMAC: unable to append structure");}
 	}
 	
-	// VERIFY HMAC FOR FILE - COMPLETE
+	/**
+	 * Crypto verifyHMAC method - verifies the HMAC for file
+	 * Parses the source file for encrypted contents and HMAC.
+	 * Then calculates HMAC using encrypted file contents.
+	 * Returns boolean result that indicates if the HMAC values match.
+	 * @param src File object that contains encrypted contents and HMAC
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Boolean value that indicates if the calculated HMAC and file HMAC match
+	 * @throws AlertException Thrown for IOExceptions, Cryptography library exceptions
+	 */
 	public static final boolean verifyHMAC(File src, final char[] pass) throws AlertException
 	{
 		final byte[] salt = new byte[SALT_SIZE];
@@ -328,7 +377,17 @@ public class Crypto
 		return Arrays.equals(value, hmac);
 	}
 	
-	// ENCRYPT AES Keywords - COMPLETE
+	/**
+	 * Crypto keyAESenc - encrypts keyword file
+	 * First a regular expression is used to test the StringBuilder structure for a comma separated list.
+	 * If successful the contents are written temporary file.
+	 * Afterwards the temporary file is encrypted using the fileAESenc method.
+	 * Upon completion the temporary file will be deleted.
+	 * @param src File object that points to the associated encrypted file
+	 * @param pass Character array that contains password used for password based encryption
+	 * @param str StringBuilder object that contains comma separated list of keywords
+	 * @throws AlertException Thrown for regular expression failure, IOExceptions
+	 */
 	public static void keyAESenc(File src, final char[] pass, final StringBuilder str) throws AlertException
 	{
 		File dest = new File(src.getAbsolutePath() + EXT);
@@ -354,7 +413,17 @@ public class Crypto
 		str.delete(0, str.length());
 	}
 	
-	// DECRYPT AES Keywords - COMPLETE
+	/**
+	 * Crypto keyAESdec - decrypts keyword file
+	 * First fileAESdec is called to decrypt the contents to a temporary file.
+	 * Then the temporary file is parsed for contents and appended to the StringBuilder.
+	 * Afterwards the temporary file is deleted.
+	 * Finally a regular expression is used to test the StringBuilder structure for a comma separated list.
+	 * @param src File object that points to the associated encrypted file
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return StringBuilder object that contains comma separated list of keywords
+	 * @throws AlertException Thrown for IOException, regular expression failure
+	 */
 	public static final StringBuilder keyAESdec(File src, final char[] pass) throws AlertException
 	{
 		File dest = new File(src.getAbsolutePath() + EXT);
@@ -384,7 +453,16 @@ public class Crypto
 		return str;
 	}
 	
-	// DELETE DATA + KEYWORD FILES - COMPLETE
+	/**
+	 * Crypto delete method - deletes the encrypted data and keyword files
+	 * First HMAC verification occurs.
+	 * If successful an attempt is made to delete the encrypted data and keyword files.
+	 * Finally a boolean result is returned that indicates if both files were deleted properly.
+	 * @param src File object that points to the associated encrypted file
+	 * @param pass Character array that contains the password used for password based encryption
+	 * @return Boolean result that indicates if both the data and keyword files were deleted
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions
+	 */
 	public static final boolean delete(File src, final char[] pass) throws AlertException
 	{
 		if(!verifyHMAC(src,pass.clone()))
@@ -401,7 +479,17 @@ public class Crypto
 		return true;
 	}
 	
-	// MOVE DATA + KEYWORD FILES - COMPLETE
+	/**
+	 * Crypto move method - moves the encrypted data and keyword files
+	 * First HMAC verification occurs.
+	 * If successful an attempt is made to rename the encrypted data and keyword files.
+	 * Finally a boolean result is returned that indicates if both files were moved properly.
+	 * @param src File object that points to the associated encrypted file
+	 * @param dest File object that points to the new destination path
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Boolean result that indicates if both the data and keyword files were moved
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions
+	 */
 	public static final boolean move(File src, File dest, final char[] pass) throws AlertException
 	{
 		if(!verifyHMAC(src,pass.clone()))
@@ -419,7 +507,11 @@ public class Crypto
 		return true;
 	}
 	
-	// Test Main
+	/**
+	 * Crypto main method - used for example test cases
+	 * @param args no arguments should be supplied or required
+	 * @throws Exception - inappropriate catch all case
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		File cleartext = new File("cleartext.txt");
@@ -466,7 +558,12 @@ public class Crypto
 	}
 	
 	// BEGIN HELPER METHODS - BELOW THIS LINE
-	// Convert Char to Byte Array (ASCII Password)
+	/**
+	 * Crypto convertChars method
+	 * Converts ASCII character array to byte array
+	 * @param chars Character array to be converted
+	 * @return Byte array that contains converted contents
+	 */
 	public static byte[] convertChars(final char[] chars)
 	{
 		byte[] bytes = new byte[chars.length];
@@ -474,7 +571,12 @@ public class Crypto
 			bytes[i] = (byte) chars[i];
 		return bytes;
 	}
-	// Convert Byte to Char Array (ASCII Password)
+	/**
+	 * Crypto convertBytes method
+	 * Converts Byte array to ASCII character array
+	 * @param bytes Byte array to be converted
+	 * @return Character array that contains converted contents
+	 */
 	public static char[] convertBytes(final byte[] bytes)
 	{
 		char[] chars = new char[bytes.length];
@@ -482,7 +584,12 @@ public class Crypto
 			chars[i] = (char) bytes[i];
 		return chars;
 	}
-	// Generate Number of Bytes using SecureRandom
+	/**
+	 * Crypto generateBytes method
+	 * Uses SecureRandom to generate indicated number of bytes
+	 * @param num Integer that indicates the number of bytes to generate
+	 * @return Byte array that contains random bytes
+	 */
 	public static final byte[] generateBytes(int num)
 	{
 		num = (num >= 0) ? num : 0;
@@ -491,7 +598,12 @@ public class Crypto
 		sr.nextBytes(bytes);
 		return bytes;
 	}
-	// Convert Byte Array to HEX String
+	/**
+	 * Crypto toHexString method
+	 * Converts Byte array to String with HEX representation
+	 * @param bytes - Byte array to be converted
+	 * @return String with HEX representation
+	 */
 	public static final String toHexString(final byte[] bytes)
 	{
 		StringBuffer buf = new StringBuffer(bytes.length * 2);
@@ -505,7 +617,12 @@ public class Crypto
 		}
 		return buf.toString().toUpperCase();
 	}
-	// Convert HEX String to Byte Array
+	/**
+	 * Crypto toByteArray method
+	 * Converts String with HEX representation to byte array
+	 * @param str String with HEX representation
+	 * @return Byte array with converted contents
+	 */
 	public static final byte[] toByteArray(final String str)
 	{
 		int len = str.length();
