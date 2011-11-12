@@ -2,7 +2,6 @@ import java.sql.*;
 import java.util.Vector;
 
 //TODO - Javadoc comments
-// cryptoproject11@gmail.com // password
 
 public class SQL
 {
