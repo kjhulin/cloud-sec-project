@@ -1,3 +1,4 @@
+package crypto;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,8 +21,14 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-//TODO - Javadoc comments
-
+/**
+ * Class: SSE2.java - Implementation for SSE2 Symmetric Searchable Encryption
+ * Author: Donald Talkington - dst071000@utdallas.edu
+ * Project: Dropbox API with Symmetric Searchable Encryption
+ * Date: November 11th, 2011
+ * Version: 1.0
+ * @author dtalk
+ */
 public class SSE2
 {
 	private final static int SALT_SIZE = 8;
@@ -32,12 +39,18 @@ public class SSE2
 	private final static String HMAC_MODE = "HmacSHA256";
 	private final static int AES_KEY_SIZE = 128;
 	private final static String AES_CIPHER_MODE = "AES/CBC/PKCS5Padding";
-
 	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
 	private final static String DB_FILE = "SSE2.DB";
 	private final static String DB_EXT = ".EXT";
 	
-	// CREATE DATABASE + STRUCTURE FILES - COMPLETE
+	/**
+	 * SSE2 createDatabase method
+	 * Performs HMAC verification. If successful, append structure to file.
+	 * Finally makes method call to appendHMAC to calcualte and append HMAC.
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Boolean result that indicates if creation of structure file was successful
+	 * @throws AlertException Thrown for HMAC verification failures, IOException exceptions
+	 */
 	public static final boolean createDatabase(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
@@ -78,7 +91,13 @@ public class SSE2
 		return true;
 	}
 	
-	// DELETE DATABASE + STRUCTURE FILES - COMPLETE
+	 /**
+	 * SSE2 deleteDatabase method
+	 * Performs HMAC verification. If successful, an attempt is made to delete both the database and structure files.
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Boolean result that indicates if database and structure files were deleted successfully
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions
+	 */
 	public static final boolean deleteDatabase(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
@@ -97,7 +116,12 @@ public class SSE2
 		return true;
 	}
 	
-	// APPEND HMAC TO FILE - COMPLETE
+	/**
+	 * SSE2 appendHMAC method
+	 * Calculates HMAC for database file and appends the result to structure file
+	 * @param pass Character array that contains password used for password based encryption
+	 * @throws AlertException Thrown for Cryptography library, IOExceptions
+	 */
 	private static void appendHMAC(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
@@ -146,7 +170,14 @@ public class SSE2
 		{throw new AlertException("appendHMAC: unable to append structure");}
 	}
 	
-	// VERIFY HMAC for DATABASE FILE - COMPLETE
+	/**
+	 * SSE2 verifyHMAC method
+	 * Parses structure document for HMAC and contents.
+	 * Calculates HMAC for database file and returns the comparsion of the results.
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Boolean result that indicates if the HMAC values match
+	 * @throws AlertException Thrown of IOException, Cryptography library exceptions
+	 */
 	public static final boolean verifyHMAC(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
@@ -199,7 +230,24 @@ public class SSE2
 		return Arrays.equals(value, hmac);
 	}
 	
-	// SSE2 Build Index Function - COMPLETE
+	/**
+	 * SSE2 buildIndex method - used to rebuild document and lookup tables
+	 * Delete database and structure files
+	 * Create empty SQL database file
+	 * Create database structure file and append HMAC
+	 * Traverse top level directory for all keyword files
+	 * Obtain maximum document id
+	 * For each document id (1 to max) - obtain absolute path, decrypt keyword list, parse keyword list, and insert words into word table
+	 * Parse structure document for contents, and generate secret key
+	 * Obtain distinct set of keywords for all documents
+	 * For each distinct word - obtain document ids that contain that keyword, encrypt keyword, and insert value into lookup table
+	 * Pad lookup table with random entries
+	 * Drop word table
+	 * Append new HMAC to structure file
+	 * @param dir File object that points to the top level directory of all keyword files
+	 * @param pass Character array that contains the password used for password based encryption
+	 * @throws AlertException Thrown for SQLException, IOException, Cryptography library exceptions
+	 */
 	public static void buildIndex(File dir, final char[] pass) throws AlertException
 	{	
 		if(!deleteDatabase(pass.clone()))
@@ -377,7 +425,13 @@ public class SSE2
 		Arrays.fill(pass, (char) 0);
 	}
 	
-	// SSE2 Trapdoor Function - COMPLETE
+	/**
+	 * SSE2 trapdoor method - used to generate possbile trapdoor values for specific word
+	 * @param w String representation of word
+	 * @param pass Character array that contains the password used for password based encryption
+	 * @return Vector of Strings with HEX representations of encrypted word
+	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions, SQLException, Cryptography library exceptions
+	 */
 	public static Vector<String> trapdoor(String w, final char[] pass) throws AlertException
 	{	
 		if(!verifyHMAC(pass.clone()))
@@ -447,7 +501,13 @@ public class SSE2
 		return traps;
 	}
 	
-	// SSE2 Search - COMPLETE
+	/**
+	 * SSE2 search method - performs query of provided trapdoors
+	 * @param traps Vector of Strings with representation of keywords in HEX form
+	 * @param pass Character array that contains password used for password based encryption
+	 * @return Vector of Strings which represent the absolute document paths which contain keywords
+	 * @throws AlertException Thrown for HMAC verification failure, SQLException
+	 */
 	public static Vector<String> search(final Vector<String> traps, final char[] pass) throws AlertException
 	{
 		if(!verifyHMAC(pass.clone()))
@@ -463,7 +523,12 @@ public class SSE2
 		return docs;
 	}
 	
-	// PARSE KEYWORDS - COMPLETE
+	/**
+	 * SSE2 parseKeys method - parses comma separated list into array
+	 * @param str StringBuilder which contains comma separated keyword list
+	 * @return Vector of Strings which contains all the keywords
+	 * @throws AlertException Thrown for regular expression exception
+	 */
 	public static Vector<String> parseKeys(StringBuilder str) throws AlertException
 	{
 		if(!Pattern.matches(regex, str))
@@ -497,7 +562,11 @@ public class SSE2
 		return words;
 	}
 	
-	// TEST MAIN
+	/**
+	 * SSE2 main method - test cases
+	 * @param args no arguments should be provided or required
+	 * @throws Exception inappropriate use of catch-all case
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		String pw = "This is an extremely long generic key 0123456789 !@#$%^&*(){}|:\"<>?,./;'[]\'";
