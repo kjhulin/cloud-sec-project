@@ -45,6 +45,7 @@ public class AuthWindow extends javax.swing.JFrame {
     static public WebAuthSession authWAS;
     public RequestTokenPair rtp;
     public static AuthWindow aw;
+    public String currentUserPath = "";
     
 
     /** Creates new form AuthWindow */
@@ -207,7 +208,7 @@ public class AuthWindow extends javax.swing.JFrame {
             //create that folder
             userFolder.mkdir();
         }
-        
+        currentUserPath = userFolder.getAbsolutePath();
         obtainFiles(userFolder);
         //point Jtree at folder
         MainWindow.jtree.setVisible(false);
@@ -295,6 +296,8 @@ public class AuthWindow extends javax.swing.JFrame {
             //create that folder
             userFolder.mkdir();
         }
+
+        currentUserPath = userFolder.getAbsolutePath();
         obtainFiles(userFolder);
         MainWindow.jtree.setVisible(false);
         FileTreeModel model = new FileTreeModel(userFolder);
