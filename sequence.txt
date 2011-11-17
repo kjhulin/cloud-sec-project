@@ -1,60 +1,54 @@
-Edit (Ciphertext, Keyword) - Delete
-delete
-	src - current encrypted version
-	pass - password (file)
-dropbox API - delete file?
+1) Edit (Ciphertext, Keyword) - Delete
+	1.1) delete
+		src - current encrypted version
+		pass - password (file)
+	1.2) dropbox API - delete file?
 
 
-Edit (Ciphertext) - Update
-fileAESenc
-	src - contents
-	dest - current encrypted version
-	pass - password (file)
-	delete - "checkbox" from prompt
-dropbox API - delete and update file?
+2) Edit (Ciphertext) - Update
+	2.1) fileAESenc
+		src - contents
+		dest - current encrypted version
+		pass - password (file)
+		delete - "checkbox" from prompt
+	2.2) dropbox API - delete and update file?
 
-Edit (Cleartext) - Save As
-fileAESdec
-	src - current encrypted version
-	dest - path to save file to
-	pass - password (file)
+3) Edit (Cleartext) - Save As
+	3.1) fileAESdec
+		src - current encrypted version
+		dest - path to save file to
+		pass - password (file)
+
+4) Move (Ciphertext, Keywords)
+	4.1) move
+		src - current encrypted version
+		dest - path to move encrypted version to
+		pass - password (file)
+	4.2) dropbox API - delete, update, or move file?
 
 
-Move (Ciphertext, Keywords)
-move
-	src - current encrypted version
-	dest - path to move encrypted version to
-	pass - password (file)
-dropbox API - delete, update, or move file?
-
-
-Edit (Keyword) - Show
-keyAESdec <- returns StringBuilder
-	src - current encrypted version (file)
-	pass - password (search)
-
-Edit (Keyword) - Update
-keyAESenc
-	src - current encrypted version (file)
-	pass - password (search)
-	str - StringBuilder (comma delimited words)
-
-Search (SSE)
-	createDatabase
+5) Edit (Keyword) - Show
+	5.1) keyAESdec <- returns StringBuilder
+		src - current encrypted version (file)
 		pass - password (search)
-	buildIndex
+
+6) Edit (Keyword) - Update
+	6.1) keyAESenc
+		src - current encrypted version (file)
+		pass - password (search)
+		str - StringBuilder (comma delimited words)
+
+7) Search (SSE)
+	7.1) createDatabase
+		pass - password (search)
+	7.2) buildIndex
 		dir - "Crypto Project" directory path
 		pass - password (search)
-	trapdoor
+	7.3) trapdoor
 		w - String for word
 		pass - password (search)
-	search
+	7.4) search
 		traps - vector<String> trapdoors
 		pass - password (search)
-	deleteDatabase
+	7.5) deleteDatabase
 		pass - password (search)
-
-
-
-
-
