@@ -44,6 +44,7 @@ public class AuthWindow extends javax.swing.JFrame {
     public boolean isAuthed = false;
     static public WebAuthSession authWAS;
     public RequestTokenPair rtp;
+    public static AuthWindow aw;
     
 
     /** Creates new form AuthWindow */
@@ -106,7 +107,6 @@ public class AuthWindow extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         lbl_currentUser = new javax.swing.JLabel();
         btn_logOut = new javax.swing.JButton();
-        btn_logIn = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         btn_confirm = new javax.swing.JButton();
         btn_Continue = new javax.swing.JButton();
@@ -121,13 +121,6 @@ public class AuthWindow extends javax.swing.JFrame {
         btn_logOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_logOutActionPerformed(evt);
-            }
-        });
-
-        btn_logIn.setText("Log In");
-        btn_logIn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_logInActionPerformed(evt);
             }
         });
 
@@ -157,9 +150,6 @@ public class AuthWindow extends javax.swing.JFrame {
                     .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btn_logIn, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(btn_confirm, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -184,53 +174,13 @@ public class AuthWindow extends javax.swing.JFrame {
                 .addComponent(btn_logOut)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btn_logIn)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addComponent(btn_confirm)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btn_logInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logInActionPerformed
-        // TODO add your handling code here:
-/*
-        System.out.println("Login button hit");
-        try
-           {
-               if(!isAuthed)
-               {//GOGO AUTHENTICATE
-                   authWAS = new WebAuthSession(MainWindow.AKPair, MainWindow.ACCESS_TYPE);
-                   MainWindow.DAPI = new DropboxAPI<WebAuthSession>(authWAS);
-                   WebAuthInfo authInfo = MainWindow.DAPI.getSession().getAuthInfo();
-                   RequestTokenPair rtp = authInfo.requestTokenPair;
-
-                   //Launch Browser for user to click accept
-                   try{
-                       URI authURL = new URI(authInfo.url);
-                       MainWindow.desktop.browse(authURL);
-                   }catch(Exception e){
-                       System.err.println("Error opening webpage");
-                       e.printStackTrace();
-                       System.err.println("Navigate to: " + authInfo.url);
-                   }
-
-                   //Wait for user!
-
-
-
-                   System.out.println("Hit enter once you have logged into Drop Box and granted permission to this application");
-                   Scanner in = new Scanner(System.in);
-                   in.nextLine();
-                   //Store key!
-               } //end of if statement
-       }catch(Exception e){e.printStackTrace();}
-*/
-
-
-    }//GEN-LAST:event_btn_logInActionPerformed
 
     private void btn_confirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_confirmActionPerformed
         // TODO add your handling code here:
@@ -265,7 +215,7 @@ public class AuthWindow extends javax.swing.JFrame {
         MainWindow.jtree.setModel(model);
         MainWindow.jtree.setVisible(true);
 
-
+        this.setVisible(false);
         }catch(Exception e){e.printStackTrace();}
 
     }//GEN-LAST:event_btn_confirmActionPerformed
@@ -350,6 +300,8 @@ public class AuthWindow extends javax.swing.JFrame {
         FileTreeModel model = new FileTreeModel(userFolder);
         MainWindow.jtree.setModel(model);
         MainWindow.jtree.setVisible(true);
+
+        this.setVisible(false);
     }//GEN-LAST:event_btn_ContinueActionPerformed
 
     /**
@@ -358,7 +310,7 @@ public class AuthWindow extends javax.swing.JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AuthWindow().setVisible(true);
+                aw.setVisible(true);
             }
         });
     }
@@ -366,7 +318,6 @@ public class AuthWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Continue;
     private javax.swing.JButton btn_confirm;
-    private javax.swing.JButton btn_logIn;
     private javax.swing.JButton btn_logOut;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JSeparator jSeparator1;
