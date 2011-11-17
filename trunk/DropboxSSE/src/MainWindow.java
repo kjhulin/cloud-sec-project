@@ -92,6 +92,11 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         btn_EditFile.setText("Edit File");
+        btn_EditFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_EditFileActionPerformed(evt);
+            }
+        });
 
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -181,6 +186,12 @@ public class MainWindow extends javax.swing.JFrame {
         jtree.setVisible(true);
         }catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RemoveFileActionPerformed
+
+    private void btn_EditFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EditFileActionPerformed
+        // TODO add your handling code here:
+        System.out.println(jtree.getSelectionPath().toString());
+
+    }//GEN-LAST:event_btn_EditFileActionPerformed
 
     /**
     * @param args the command line arguments
