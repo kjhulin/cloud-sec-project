@@ -105,7 +105,7 @@ public class Crypto
 			is.close();
 			os.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException innii)
+                catch(Exception e)
 		{throw new AlertException("fileAESenc: unable to encrypt source to destination");}
 		
 		try
@@ -207,7 +207,7 @@ public class Crypto
 			is.close();
 			os.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | InvalidKeyException innii)
+		catch(Exception e)
 		{throw new AlertException("fileAESdec: unable to decrypt source to destination");}
 	}
 	
@@ -288,7 +288,7 @@ public class Crypto
 			value = mac.doFinal();
 			is.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | InvalidKeyException ini)
+		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to calculate hmac");}
 		
 		RandomAccessFile file;
@@ -371,7 +371,7 @@ public class Crypto
 			value = mac.doFinal();
 			is.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | InvalidKeyException ini)
+		catch(Exception e)
 		{throw new AlertException("verifyHMAC: unable to calcuate hmac");}
 		
 		return Arrays.equals(value, hmac);

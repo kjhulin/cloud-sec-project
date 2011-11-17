@@ -78,7 +78,7 @@ public class SQL
 		    	paths.add(path);
 		    }
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("selectLookup: unable to lookup values");}
 		finally
 		{
@@ -118,7 +118,7 @@ public class SQL
 		    while(rs.next())
 		    {count++;}
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("checkLookupValue: unable to check value");}
 		finally
 		{
@@ -162,7 +162,7 @@ public class SQL
 		    	results.add(id + "," + count);
 		    }
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getLookupCount: unable to count values");}
 		finally
 		{
@@ -206,7 +206,7 @@ public class SQL
 		    	ids.add(id);
 		    }
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getDocumentsWord: unable to select ids");}
 		finally
 		{
@@ -248,7 +248,7 @@ public class SQL
 		    	words.add(w);
 		    }
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getDistinctWords: unable to select words");}
 		finally
 		{
@@ -285,7 +285,7 @@ public class SQL
 	    	prep.setInt(2, id);
 	    	prep.executeUpdate();
 	    }
-	    catch(SQLException | ClassNotFoundException e)
+	    catch(Exception e)
 	    {result = false;}
 	    finally
 	    {
@@ -320,7 +320,7 @@ public class SQL
 	    	prep.setInt(2, id);
 	    	prep.executeUpdate();
 	    }
-	    catch(SQLException | ClassNotFoundException e)
+	    catch(Exception e)
 	    {result = false;}
 	    finally
 	    {
@@ -353,7 +353,7 @@ public class SQL
 	    	prep.setString(1, path);
 	    	prep.executeUpdate();
 	    }
-	    catch(SQLException | ClassNotFoundException e)
+	    catch(Exception e)
 	    {result = false;}
 	    finally
 	    {
@@ -391,7 +391,7 @@ public class SQL
 		    while(rs.next())
 		    {result = rs.getInt("id");}
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getDocumentID: unable to select document id");}
 		finally
 		{
@@ -431,7 +431,7 @@ public class SQL
 		    while(rs.next())
 		    {result = rs.getString("path");}
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getDocumentID: unable to select document id");}
 		finally
 		{
@@ -471,7 +471,7 @@ public class SQL
 		    
 		    result = (int) Math.ceil((double)(result / 2.0));
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getMaxLookupValue: unable to select max value");}
 		finally
 		{
@@ -509,7 +509,7 @@ public class SQL
 		    while(rs.next())
 		    {result = rs.getInt("max(id)");}
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{throw new AlertException("getMaxDocumentID: unable to select max id");}
 		finally
 		{
@@ -543,7 +543,7 @@ public class SQL
 			result = state.executeUpdate(DROP_WORD_TABLE) == 0 ? true : false;
 			result = result && state.executeUpdate(CREATE_WORD_TABLE) == 0 ? true : false;
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{result = false;}
 		finally
 		{
@@ -576,7 +576,7 @@ public class SQL
 			result = result && state.executeUpdate(DROP_WORD_TABLE) == 0 ? true : false;
 			result = result && state.executeUpdate(DROP_DOCUMENT_TABLE) == 0 ? true : false;
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{result = false;}
 		finally
 		{
@@ -609,7 +609,7 @@ public class SQL
 			result = result && state.executeUpdate(CREATE_WORD_TABLE) == 0 ? true : false;
 			result = result && state.executeUpdate(CREATE_LOOKUP_TABLE) == 0 ? true : false;
 		}
-		catch(SQLException | ClassNotFoundException e)
+		catch(Exception e)
 		{result = false;}
 		finally
 		{
