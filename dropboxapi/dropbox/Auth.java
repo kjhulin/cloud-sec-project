@@ -126,7 +126,14 @@ public class Auth
         	DAPI.putFile(f.getName(),new FileInputStream(f), f.length(),null, null);
         	for(Entry e : listDirectory("SecureSSE")){
         		System.out.println(e.fileName());
-        		//DropboxInputStream dis DAPI.
+        		DropboxAPI.DropboxInputStream dis = DAPI.getFileStream(e.fileName(), null);
+        		int tmp;
+        		while((tmp = dis.read())!=-1){
+        			System.out.print((char)tmp);
+        		}
+        		dis.close();
+        		System.out.println();
+        		
         	}
         }catch(Exception e){
         	e.printStackTrace();
