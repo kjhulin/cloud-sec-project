@@ -31,9 +31,11 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Desktop;
+import java.io.FilenameFilter;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
@@ -395,6 +397,12 @@ class TokenContainer implements Serializable{
  * the file system tree and display the files and directories.
  **/
 class FileTreeModel implements TreeModel {
+    FilenameFilter ff = new FilenameFilter() {
+
+        public boolean accept(File file, String string) {
+            return !string.startsWith(".");
+        }
+    };
   // We specify the root directory when we create the model.
   protected File root;
   public FileTreeModel(File root) { this.root = root; }
@@ -407,7 +415,9 @@ class FileTreeModel implements TreeModel {
 
   // Tell JTree how many children a node has
   public int getChildCount(Object parent) {
-    String[] children = ((File)parent).list();
+      
+    String[] children = ((File)parent).list(ff);
+    System.out.println(Arrays.toString(children));
     if (children == null) return 0;
     return children.length;
   }
@@ -416,14 +426,14 @@ class FileTreeModel implements TreeModel {
   // Our model returns File objects for all nodes in the tree.  The
   // JTree displays these by calling the File.toString() method.
   public Object getChild(Object parent, int index) {
-    String[] children = ((File)parent).list();
+    String[] children = ((File)parent).list(ff);
     if ((children == null) || (index >= children.length)) return null;
     return new File((File) parent, children[index]);
   }
 
   // Figure out a child's position in its parent node.
   public int getIndexOfChild(Object parent, Object child) {
-    String[] children = ((File)parent).list();
+    String[] children = ((File)parent).list(ff);
     if (children == null) return -1;
     String childname = ((File)child).getName();
     for(int i = 0; i < children.length; i++) {
