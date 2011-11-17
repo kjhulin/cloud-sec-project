@@ -21,7 +21,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -29,7 +32,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Desktop;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
@@ -67,7 +73,7 @@ public class AuthWindow extends javax.swing.JFrame {
 
                 //set lbl_currentUser == username in file
                 lbl_currentUser.setText(tkc.username);
-
+                MainWindow.userName = tkc.username;
                 isAuthed = true;
             }catch(Exception e){e.printStackTrace();}
         }
@@ -197,16 +203,26 @@ public class AuthWindow extends javax.swing.JFrame {
         oos.writeObject(tkc);
         oos.close();
 
-
+        MainWindow.userName = tkc.username;
         File userFolder = new File(tkc.username.toString());
         if(userFolder.exists())
         {
-            //okay that's cool
+            //okay that's cool -- Grab the meta data
+            if(new File(MainWindow.userName.toString()+File.separator+".meta").exists()){
+                ObjectInputStream ois = new ObjectInputStream(new
+                        BufferedInputStream(new FileInputStream(tkc.username.toString()+File.separator+".meta")));
+                MainWindow.meta =  (HashMap<String,Date>)ois.readObject();
+                ois.close();
+                System.out.println(MainWindow.meta);
+            }else{
+                MainWindow.meta = new HashMap<String,Date>();
+            }
         }
         else
         {
             //create that folder
             userFolder.mkdir();
+            MainWindow.meta = new HashMap<String,Date>();
         }
         currentUserPath = userFolder.getAbsolutePath();
         obtainFiles(userFolder);
@@ -229,9 +245,11 @@ public class AuthWindow extends javax.swing.JFrame {
             }catch(Exception e){e.printStackTrace();}
             
     }
+    
+    public static SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss ZZZZZ");
     public static void getFolderContents(String s, File uPath){
-                            System.out.println("UPATH: "+ uPath);
-                            System.out.println("s: "+s);
+        System.out.println("UPATH: "+ uPath);
+        System.out.println("s: "+s);
         try{
 
             //upath == user path
@@ -243,10 +261,8 @@ public class AuthWindow extends javax.swing.JFrame {
                     System.out.println("eParentPath: "+e.parentPath());
                     File path = new File(uPath.toString() + File.separator + e.fileName());
                     System.out.println("PATH: "+path.getAbsolutePath().toString());
-                    path.mkdir();
-                    if(path.exists())
-                    {
-                        System.out.println("made dir");
+                    if(!path.exists()){
+                        path.mkdir();
                     }
                     getFolderContents(e.parentPath() + e.fileName(), path);
                 }else{
@@ -254,13 +270,20 @@ public class AuthWindow extends javax.swing.JFrame {
                     System.out.println("PARENT PATH: " + e.parentPath());
 
                     File downloadPath = new File(uPath.toString() + File.separator + e.fileName());
+                    Date dateModified = df.parse(e.modified);
+                    System.out.println(dateModified.toString());
                     System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
-
-                    DropboxFileInfo dis =
-                        MainWindow.DAPI.getFile(e.parentPath()+e.fileName(), null, new FileOutputStream(downloadPath.toString()), null);
-                    System.out.println();
+                    String dbPath = e.parentPath()+e.fileName();
+                    if(!MainWindow.meta.containsKey(dbPath) ||
+                            !new File(downloadPath.toString()).exists() ||
+                        dateModified.after(MainWindow.meta.get(dbPath))){
+                        System.out.println("Downloading new version of " + dbPath);
+                        DropboxFileInfo dis =
+                            MainWindow.DAPI.getFile(dbPath, null, new FileOutputStream(downloadPath.toString()), null);
+                        MainWindow.updateMeta(dbPath, dateModified);
+                    }
                 }
-                }
+            }
         }catch(Exception e){e.printStackTrace();}
     }
 
@@ -281,20 +304,33 @@ public class AuthWindow extends javax.swing.JFrame {
 
     private void btn_ContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ContinueActionPerformed
         // TODO add your handling code here:
-
-        AccessTokenPair atp = authWAS.getAccessTokenPair();
         
+        //AccessTokenPair atp = authWAS.getAccessTokenPair();
+        MainWindow.userName = lbl_currentUser.getText();
         System.out.println(lbl_currentUser.getText());
         File userFolder = new File(lbl_currentUser.getText());
         if(userFolder.exists())
         {
-            //okay that's cool
-            System.out.println("FOLDER EXISTS");
+            //okay that's cool -- Grab the meta data
+            if(new File(MainWindow.userName.toString()+File.separator+".meta").exists()){
+                try{
+                ObjectInputStream ois = new ObjectInputStream(new
+                        BufferedInputStream(new FileInputStream(MainWindow.userName.toString()+File.separator+".meta")));
+                MainWindow.meta =  (HashMap<String,Date>)ois.readObject();
+                ois.close();
+                }catch(Exception e){
+                    System.err.println("Error reading .meta -- recreating");
+                    MainWindow.meta = new HashMap<String,Date>();
+                }
+            }else{
+                MainWindow.meta = new HashMap<String,Date>();
+            }
         }
         else
         {
             //create that folder
             userFolder.mkdir();
+            MainWindow.meta = new HashMap<String,Date>();
         }
 
         currentUserPath = userFolder.getAbsolutePath();

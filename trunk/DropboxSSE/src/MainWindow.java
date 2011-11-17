@@ -27,6 +27,8 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Desktop;
+import java.util.Date;
+import java.util.HashMap;
 import javax.swing.table.*;
 import javax.swing.JTree;
 
@@ -48,8 +50,8 @@ import javax.swing.JTree;
 public class MainWindow extends javax.swing.JFrame {
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
-
-
+    public static String userName = "";
+    public static HashMap<String,Date> meta;
 
     
     /** Creates new form MainWindow */
@@ -60,6 +62,20 @@ public class MainWindow extends javax.swing.JFrame {
         aw.setVisible(true);
        
 
+    }
+    
+    public static void updateMeta(String filePath, Date mod){
+        meta.put(filePath, mod);
+        try{ //Update meta file
+            System.out.println(filePath + " -- " + mod);
+            System.out.println("Updating meta file " + userName + File.separator+".meta");
+            ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(userName + File.separator+".meta")));
+            oos.writeObject(meta);
+            oos.close();
+        }catch(Exception e){
+            System.err.println("Error writing to meta file");
+            e.printStackTrace();
+        }
     }
 
 
