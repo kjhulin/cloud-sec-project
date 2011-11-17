@@ -43,7 +43,7 @@ public class SQL
 	 * SQL selectLookup method - used to search or lookup trapdoors
 	 * @param traps Vector that contains Strings with HEX representation of trapdoors
 	 * @return Vector that contains Strings with paths to documents that matched the supplied trapdoors
-	 * @throws AlertException Thrown for SQLExceptions, IOExceptions
+	 * @throws AlertException Thrown for Exceptions, IOExceptions
 	 */
 	public static final Vector<String> selectLookup(final Vector<String> traps) throws AlertException
 	{
@@ -89,7 +89,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return paths;
@@ -99,7 +99,7 @@ public class SQL
 	 * SQL checkLookupValue method - used to check if lookup table contains value
 	 * @param val String value with HEX representation
 	 * @return Integer that indicates the number of time the HEX representation appears in the table
-	 * @throws AlertException Thrown for SQLExceptions, IOExceptions
+	 * @throws AlertException Thrown for Exceptions, IOExceptions
 	 */
 	public static final int checkLookupValue(final String val) throws AlertException
 	{
@@ -129,7 +129,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return count;
@@ -138,7 +138,7 @@ public class SQL
 	/**
 	 * SQL getLookupCount - used to determine the number listings for each document
 	 * @return Vector of Strings that represent command separated list (id,number of listings)
-	 * @throws AlertException Thrown for SQLException, IOException
+	 * @throws AlertException Thrown for Exception, IOException
 	 */
 	public static final Vector<String> getLookupCount() throws AlertException
 	{
@@ -173,7 +173,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return results;
@@ -183,7 +183,7 @@ public class SQL
 	 * SQL getDocumentsWord method - used to document ids associated with a word
 	 * @param w - String represents the word
 	 * @return Vector of Integers which indicated document ids associated with the provided word
-	 * @throws AlertException Thrown for SQLException, IOException
+	 * @throws AlertException Thrown for Exception, IOException
 	 */
 	public static final Vector<Integer> getDocumentsWord(final String w) throws AlertException
 	{
@@ -217,7 +217,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return ids;
@@ -226,7 +226,7 @@ public class SQL
 	/**
 	 * SQL getDistinctWords method - used to create list of distinct words
 	 * @return Vector of Strings that represent the non-duplicate set of words
-	 * @throws AlertException Thrown for SQLException, IOExceptions
+	 * @throws AlertException Thrown for Exception, IOExceptions
 	 */
 	public static final Vector<String> getDistinctWords() throws AlertException
 	{
@@ -259,7 +259,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return words;
@@ -293,7 +293,7 @@ public class SQL
 	    	{
 	    		try
 	    		{conn.close();}
-	    		catch(SQLException e){}
+	    		catch(Exception e){}
 	    	}
 	    }
 	    
@@ -328,7 +328,7 @@ public class SQL
 	    	{
 	    		try
 	    		{conn.close();}
-	    		catch(SQLException e){}
+	    		catch(Exception e){}
 	    	}
 	    }
 	    
@@ -361,7 +361,7 @@ public class SQL
 	    	{
 	    		try
 	    		{conn.close();}
-	    		catch(SQLException e){}
+	    		catch(Exception e){}
 	    	}
 	    }
 	    
@@ -372,7 +372,7 @@ public class SQL
 	 * SQL getDocumentID method - used to retrieve document id for particular absolute document path
 	 * @param path String that contains absolute path to document
 	 * @return Integer that indicates the associated document id
-	 * @throws AlertException Thrown for SQLExceptions, IOExceptions
+	 * @throws AlertException Thrown for Exceptions, IOExceptions
 	 */
 	public static final int getDocumentID(final String path) throws AlertException
 	{
@@ -402,7 +402,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return result;
@@ -412,7 +412,7 @@ public class SQL
 	 * SQL getDocumentPath method - used to retrieve document path for associated document id
 	 * @param id - Integer that indicates the associated document id
 	 * @return String that contains absolute path to document
-	 * @throws AlertException Thrown for SQLExceptions, IOExceptions
+	 * @throws AlertException Thrown for Exceptions, IOExceptions
 	 */
 	public static final String getDocumentPath(final int id) throws AlertException
 	{
@@ -442,7 +442,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return result;
@@ -451,7 +451,7 @@ public class SQL
 	/**
 	 * SQL getMaxLookupValue method - used to determine the maximum length of all lookup values
 	 * @return Integer that represents maximum length in bytes (values are in HEX)
-	 * @throws AlertException Thrown for SQLException, IOException
+	 * @throws AlertException Thrown for Exception, IOException
 	 */
 	public static final int getMaxLookupValue() throws AlertException
 	{
@@ -482,7 +482,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 	    
 	    return result;
@@ -491,7 +491,7 @@ public class SQL
 	/**
 	 * SQL getMaxDocumentID method - used to determine maximum associated document id
 	 * @return Integer that represents the maximum document id
-	 * @throws AlertException Thrown for SQLException, IOException
+	 * @throws AlertException Thrown for Exception, IOException
 	 */
 	public static final int getMaxDocumentID() throws AlertException
 	{
@@ -520,7 +520,7 @@ public class SQL
 				if(conn != null)
 					conn.close();
 			}
-			catch(SQLException e){}
+			catch(Exception e){}
 		}
 		
 	    return result;
@@ -551,7 +551,7 @@ public class SQL
 			{
 				try
 				{conn.close();}
-				catch(SQLException e){}
+				catch(Exception e){}
 			}
 		}
 		
@@ -584,7 +584,7 @@ public class SQL
 			{
 				try
 				{conn.close();}
-				catch(SQLException e){}
+				catch(Exception e){}
 			}
 		}
 		
@@ -617,7 +617,7 @@ public class SQL
 			{
 				try
 				{conn.close();}
-				catch(SQLException e){}
+				catch(Exception e){}
 			}
 		}
 		
@@ -626,7 +626,7 @@ public class SQL
 	
 	/**
 	 * SQL showDatabase method - used to display the contents of all tables
-	 * @throws Exception Thrown for SQLException, IOException
+	 * @throws Exception Thrown for Exception, IOException
 	 */
 	public static void showDatabase() throws Exception
 	{
