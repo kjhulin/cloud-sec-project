@@ -148,7 +148,7 @@ public class SSE2
 			value = mac.doFinal();
 			is.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | InvalidKeyException ini)
+		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to calculate hmac");}
 		
 		RandomAccessFile file;
@@ -224,7 +224,7 @@ public class SSE2
 			value = mac.doFinal();
 			is.close();
 		}
-		catch(IOException | NoSuchAlgorithmException | InvalidKeyException ini)
+		catch(Exception e)
 		{throw new AlertException("verifyHMAC: unable to calcuate hmac");}
 		
 		return Arrays.equals(value, hmac);
@@ -353,8 +353,8 @@ public class SSE2
 	                length += cipher.doFinal(ciphertext, length);
 	                clear = Crypto.toHexString(ciphertext);
 	        	}
-	        	catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | 
-	        			IllegalBlockSizeException | ShortBufferException | BadPaddingException e)
+	        	catch(Exception e)
+	        			
 	        	{throw new AlertException("buildIndex: unable to generate lookup value");}
 				
 				if(!SQL.setLookupValue(clear, id))
@@ -492,8 +492,8 @@ public class SSE2
                 traps.add(clear);
                 clear = null;
         	}
-        	catch(NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | 
-        			IllegalBlockSizeException | ShortBufferException | BadPaddingException e)
+        	catch(Exception e)
+        			
         	{throw new AlertException("trapdoor: unable to generate traps");}
         }
 		
