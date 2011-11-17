@@ -31,12 +31,15 @@
 	5.1) keyAESdec <- returns StringBuilder
 		src - current encrypted version (file)
 		pass - password (search)
+	5.2) SSE2.parseKeys(StringBuilder) <- Vector<Strings>
 
 6) Edit (Keyword) - Update
-	6.1) keyAESenc
+	6.1) Build StringBuilder with comma delim of keywords
+	6.2) keyAESenc
 		src - current encrypted version (file)
 		pass - password (search)
 		str - StringBuilder (comma delimited words)
+	6.2) dropbox API - delete and update file?
 
 7) Search (SSE)
 	7.1) createDatabase
