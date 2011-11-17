@@ -45,7 +45,7 @@ public class AuthWindow extends javax.swing.JFrame {
     static public WebAuthSession authWAS;
     public RequestTokenPair rtp;
     public static AuthWindow aw;
-    public String currentUserPath = "";
+    public static String currentUserPath;
     
 
     /** Creates new form AuthWindow */

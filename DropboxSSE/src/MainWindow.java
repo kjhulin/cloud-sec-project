@@ -72,13 +72,14 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jSeparator1 = new javax.swing.JSeparator();
         jButton1 = new javax.swing.JButton();
         btn_RemoveFile = new javax.swing.JButton();
-        btn_EditFile = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JSeparator();
+        btn_EditFileKeywords = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtree = new javax.swing.JTree();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        passwordField = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,14 +92,12 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        btn_EditFile.setText("Edit File");
-        btn_EditFile.addActionListener(new java.awt.event.ActionListener() {
+        btn_EditFileKeywords.setText("Edit File Content / Keywords");
+        btn_EditFileKeywords.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_EditFileActionPerformed(evt);
+                btn_EditFileKeywordsActionPerformed(evt);
             }
         });
-
-        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jtree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
@@ -107,44 +106,53 @@ public class MainWindow extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jtree);
 
+        jLabel1.setText("File Password:");
+
+        jLabel2.setText("SUPER AWESOME DROPBOX PROJECT");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(165, 165, 165)
+                .addComponent(jLabel2)
+                .addContainerGap(168, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 895, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btn_EditFile, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                            .addComponent(btn_RemoveFile, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(520, 520, 520))))
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                    .addComponent(btn_EditFileKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE))
+                .addGap(20, 20, 20)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(71, 71, 71))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(590, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(btn_RemoveFile, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                .addGap(595, 595, 595))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
                         .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_EditFile)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_RemoveFile))
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(242, 242, 242)
+                        .addComponent(jLabel2)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_EditFileKeywords)
+                    .addComponent(jLabel1)
+                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btn_RemoveFile)
                 .addContainerGap())
         );
 
@@ -187,11 +195,44 @@ public class MainWindow extends javax.swing.JFrame {
         }catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RemoveFileActionPerformed
 
-    private void btn_EditFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EditFileActionPerformed
+    private void btn_EditFileKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EditFileKeywordsActionPerformed
         // TODO add your handling code here:
-        System.out.println(jtree.getSelectionPath().toString());
+        if (jtree.getSelectionPath().toString().equals(null))
+        {
+            System.out.println("Select a file first");
+        }
+        else
+        {
+            String selectedFile = jtree.getSelectionPath().toString();
+            int lastComma = 0;
+            while(selectedFile.indexOf(",") != -1)
+            {
+                lastComma = selectedFile.indexOf(",") + 1;
+                selectedFile = selectedFile.substring(lastComma);
+            }
+            selectedFile = selectedFile.substring(selectedFile.indexOf("\\"), selectedFile.length()-1);
+            String selectedFileLocation = AuthWindow.currentUserPath + selectedFile;
+            //System.out.println("File Location: " + selectedFileLocation);
 
-    }//GEN-LAST:event_btn_EditFileActionPerformed
+            File editFile = new File(selectedFileLocation);
+
+            if (passwordField.getPassword().equals(null))
+            {
+                System.out.println("No password given");
+                //show jmessagebox?
+            }
+            else
+            {
+                //send File and Given Password to crypto
+                try
+                {
+                    //crypto.Crypto.keyAESdec(editFile, passwordField.getPassword());
+                    new EditWindow().setVisible(true);
+                }catch (Exception ae){System.out.println("Exception occured (possible bad pw");}
+            }
+        }
+
+    }//GEN-LAST:event_btn_EditFileKeywordsActionPerformed
 
     /**
     * @param args the command line arguments
@@ -217,13 +258,14 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_EditFile;
+    private javax.swing.JButton btn_EditFileKeywords;
     private javax.swing.JButton btn_RemoveFile;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     public static javax.swing.JTree jtree;
+    private javax.swing.JPasswordField passwordField;
     // End of variables declaration//GEN-END:variables
 
 }
