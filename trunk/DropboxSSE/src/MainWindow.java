@@ -48,6 +48,7 @@ import javax.swing.JTree;
  * @author Boardwalk
  */
 public class MainWindow extends javax.swing.JFrame {
+    public static String rootPath = new File(".").getAbsolutePath();
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
     public static String userName = "";
@@ -76,6 +77,13 @@ public class MainWindow extends javax.swing.JFrame {
             System.err.println("Error writing to meta file");
             e.printStackTrace();
         }
+    }
+    
+    public static Entry pushFile(File f) throws Exception{
+        String dbPath = f.getAbsolutePath().replace(rootPath,"");
+        System.out.println(dbPath);
+        return DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
+    
     }
 
 
