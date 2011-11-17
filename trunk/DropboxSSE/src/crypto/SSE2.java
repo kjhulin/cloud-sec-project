@@ -6,18 +6,11 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -63,7 +56,10 @@ public class SSE2
 		}
 		
 		if(!db.exists())
-		{throw new AlertException("createDatabase: unable to locate database file");}
+		{
+                    if(!SQL.createDatabase())
+                        throw new AlertException("createDatabase: unable to create database");
+                }
 		
 		final byte[] salt = Crypto.generateBytes(SALT_SIZE);
 		final byte[] iv = Crypto.generateBytes(IV_SIZE);
@@ -82,7 +78,7 @@ public class SSE2
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("createDatabase: unable to append structure");}
 		
 		appendHMAC(pass.clone());
@@ -166,7 +162,7 @@ public class SSE2
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to append structure");}
 	}
 	
@@ -201,7 +197,7 @@ public class SSE2
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("verifyHMAC: unable to parse structure");}
 		
 		final byte[] secret = Crypto.keygen(pass, salt, HMAC_KEY_SIZE);
@@ -307,7 +303,7 @@ public class SSE2
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("buildIndex: unable to parse structure");}
 		
 		final byte[] secret = Crypto.keygen(pass.clone(), salt, AES_KEY_SIZE);
@@ -453,7 +449,7 @@ public class SSE2
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("trapdoor: unable to parse structure");}
 		
 		final byte[] secret = Crypto.keygen(pass.clone(), salt, AES_KEY_SIZE);

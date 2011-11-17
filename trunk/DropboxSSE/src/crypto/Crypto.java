@@ -6,15 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -22,7 +18,6 @@ import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -79,7 +74,7 @@ public class Crypto
 				channel.close();
 				file.close();
 			}
-			catch(IOException ioe)
+			catch(Exception e)
 			{throw new AlertException("fileAESenc: unable to clear file");}
 		}
 		
@@ -122,7 +117,7 @@ public class Crypto
 			
 			appendHMAC(dest, pass);
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("fileAESenc: unable to append structure");}
 		
 		Arrays.fill(pass, (char) 0);
@@ -170,7 +165,7 @@ public class Crypto
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("fileAESdec: unable to parse structure");}
 		
 		if(dest.exists())
@@ -242,7 +237,7 @@ public class Crypto
 			System.arraycopy(secret, 0, result, 0, result.length);
 			Arrays.fill(secret, (byte) 0x00);
 		}
-		catch(NoSuchAlgorithmException e)
+		catch(Exception e)
 		{throw new AlertException("keygen: unable to generate secret key");}
 		
 		return result;
@@ -306,7 +301,7 @@ public class Crypto
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to append structure");}
 	}
 	
@@ -341,7 +336,7 @@ public class Crypto
 			channel.close();
 			file.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("verifyHMAC: unable to parse structure");}
 		
 		final byte[] secret = keygen(pass, salt, HMAC_KEY_SIZE);
@@ -404,7 +399,7 @@ public class Crypto
 			writer.flush();
 			writer.close();
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("keyAESenc: unable to create temp file");}
 		
 		fileAESenc(temp,dest,pass.clone(),true);
@@ -444,7 +439,7 @@ public class Crypto
 			if(!temp.delete())
 				throw new AlertException("keyAESdec: unable to delete temp file");
 		}
-		catch(IOException ioe)
+		catch(Exception e)
 		{throw new AlertException("keyAESdec: unable to create list");}
 		
 		if(!Pattern.matches(regex, str))
