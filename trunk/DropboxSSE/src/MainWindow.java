@@ -169,6 +169,11 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel3.setText("Keyword To Search For:");
 
         jButton2.setText("Add Key To Search List");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         list_SearchingFor.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -180,6 +185,11 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel4.setText("Searching For...");
 
         btn_Search.setText("Search");
+        btn_Search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_SearchActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Results:");
 
@@ -374,7 +384,16 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btn_EnableSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EnableSearchActionPerformed
         // TODO add your handling code here:
-        char[] searchKey = searchPasswordField.getPassword();
+
+    }//GEN-LAST:event_btn_EnableSearchActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        String keyToAdd = txtField_SearchForKey.getText();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
+                char[] searchKey = searchPasswordField.getPassword();
         if (searchKey.length == 0) //is null
         {
             System.out.println("No search key entered");
@@ -387,10 +406,10 @@ public class MainWindow extends javax.swing.JFrame {
                 File userRootPath = new File(rootPath);
                 crypto.SSE2.buildIndex(userRootPath, searchKey);
                 Vector<String> results = new Vector<String>();
-            
+
                 for(int i = 0; i < list_SearchingFor.getModel().getSize(); i++)
                 {
-                    Vector<String> traps = 
+                    Vector<String> traps =
                             crypto.SSE2.trapdoor(list_SearchingFor.getModel().getElementAt(i).toString(), searchKey);
 
                     results = crypto.SSE2.search(traps, searchKey);
@@ -400,12 +419,12 @@ public class MainWindow extends javax.swing.JFrame {
                 {
                     resultsModel.addElement(i);
                 }
-                
+
                 crypto.SSE2.deleteDatabase(searchKey);
             }
-            catch(Exception e){e.printStackTrace();}           
+            catch(Exception e){e.printStackTrace();}
         }
-    }//GEN-LAST:event_btn_EnableSearchActionPerformed
+    }//GEN-LAST:event_btn_SearchActionPerformed
 
     /**
     * @param args the command line arguments
