@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import java.awt.Desktop;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Vector;
+import javax.swing.DefaultListModel;
 import javax.swing.table.*;
 import javax.swing.JTree;
 
@@ -48,17 +50,24 @@ import javax.swing.JTree;
  * @author Boardwalk
  */
 public class MainWindow extends javax.swing.JFrame {
-    public static String rootPath = new File(".").getAbsolutePath();
+    public static String rootPath = new File(".").getAbsolutePath(); //does this always point to Current User's Root Folder? -CQ
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
     public static String userName = "";
     public static HashMap<String,Date> meta;
 
+    public static DefaultListModel searchingForModel;
+    public static DefaultListModel resultsModel;
+
     
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-
+        searchingForModel = new DefaultListModel();
+        resultsModel = new DefaultListModel();
+        list_SearchingFor.setModel(searchingForModel);
+        list_Results.setModel(resultsModel);
+        
         AuthWindow aw = new AuthWindow();
         aw.setVisible(true);
        
@@ -365,6 +374,37 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btn_EnableSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EnableSearchActionPerformed
         // TODO add your handling code here:
+        char[] searchKey = searchPasswordField.getPassword();
+        if (searchKey.length == 0) //is null
+        {
+            System.out.println("No search key entered");
+        }
+        else
+        {
+            try
+            {
+                crypto.SSE2.createDatabase(searchKey);
+                File userRootPath = new File(rootPath);
+                crypto.SSE2.buildIndex(userRootPath, searchKey);
+                Vector<String> results = new Vector<String>();
+            
+                for(int i = 0; i < list_SearchingFor.getModel().getSize(); i++)
+                {
+                    Vector<String> traps = 
+                            crypto.SSE2.trapdoor(list_SearchingFor.getModel().getElementAt(i).toString(), searchKey);
+
+                    results = crypto.SSE2.search(traps, searchKey);
+                }
+                //Return results here
+                for (int i = 0; i < results.size(); i++)
+                {
+                    resultsModel.addElement(i);
+                }
+                
+                crypto.SSE2.deleteDatabase(searchKey);
+            }
+            catch(Exception e){e.printStackTrace();}           
+        }
     }//GEN-LAST:event_btn_EnableSearchActionPerformed
 
     /**

@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.util.Scanner;
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
 /*
@@ -22,10 +23,14 @@ public class EditWindow extends javax.swing.JFrame {
 
     public static EditWindow ew;
     public File currentFile; //file currently being edited
+    public static DefaultListModel keywordsModel;
 
     /** Creates new form EditWindow */
     public EditWindow() {
         initComponents();
+        keywordsModel = new DefaultListModel();
+        list_Keywords.setModel(keywordsMOdel);
+        
     }
 
     public EditWindow(File passedFile) {
