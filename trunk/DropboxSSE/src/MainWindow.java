@@ -388,8 +388,8 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_EnableSearchActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
         String keyToAdd = txtField_SearchForKey.getText();
+        searchingForModel.addElement(keyToAdd);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
@@ -407,10 +407,10 @@ public class MainWindow extends javax.swing.JFrame {
                 crypto.SSE2.buildIndex(userRootPath, searchKey);
                 Vector<String> results = new Vector<String>();
 
-                for(int i = 0; i < list_SearchingFor.getModel().getSize(); i++)
+                for(int i = 0; i < searchingForModel.getSize(); i++)
                 {
                     Vector<String> traps =
-                            crypto.SSE2.trapdoor(list_SearchingFor.getModel().getElementAt(i).toString(), searchKey);
+                            crypto.SSE2.trapdoor(searchingForModel.getElementAt(i).toString(), searchKey);
 
                     results = crypto.SSE2.search(traps, searchKey);
                 }
