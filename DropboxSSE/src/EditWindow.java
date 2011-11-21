@@ -101,6 +101,11 @@ public class EditWindow extends javax.swing.JFrame {
         jLabel2.setText("Search Password:");
 
         btn_RevealKeywords.setText("Reveal File Keywords");
+        btn_RevealKeywords.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_RevealKeywordsActionPerformed(evt);
+            }
+        });
 
         btn_SaveKeywords.setText("Save Keywords");
 
@@ -211,6 +216,10 @@ public class EditWindow extends javax.swing.JFrame {
         } catch (Exception e){}
 
     }//GEN-LAST:event_btn_BrowseActionPerformed
+
+    private void btn_RevealKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RevealKeywordsActionPerformed
+
+    }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
 
     /**
     * @param args the command line arguments

@@ -196,6 +196,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Reveal File Keywords"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_RevealKeywordsActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btn_SaveKeywords">
       <Properties>
