@@ -55,3 +55,20 @@
 		pass - password (search)
 	7.5) deleteDatabase
 		pass - password (search)
+
+
+
+cam random notes:
+
+
+        System.out.println("DELETE ME: " + jtree.getSelectionPath().toString());
+
+        String deleteMe = jtree.getSelectionPath().toString();
+        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1);
+        System.out.println(deleteMe);
+
+output of above:
+
+
+DELETE ME: [Crypto Project, Crypto Project\oSnmZajg]
+oSnmZajg

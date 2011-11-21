@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.util.Scanner;
+import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
@@ -56,7 +57,7 @@ public class EditWindow extends javax.swing.JFrame {
         txtField_newKeyword = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btn_ReplaceFile = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         btn_Browse = new javax.swing.JButton();
         txtField_Browse = new javax.swing.JTextField();
@@ -87,7 +88,12 @@ public class EditWindow extends javax.swing.JFrame {
             }
         });
 
-        jButton4.setText("Replace With File At Location");
+        btn_ReplaceFile.setText("Replace With File At Location");
+        btn_ReplaceFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_ReplaceFileActionPerformed(evt);
+            }
+        });
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -100,6 +106,12 @@ public class EditWindow extends javax.swing.JFrame {
 
         jLabel2.setText("Search Password:");
 
+        searchPasswordField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchPasswordFieldActionPerformed(evt);
+            }
+        });
+
         btn_RevealKeywords.setText("Reveal File Keywords");
         btn_RevealKeywords.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -108,6 +120,11 @@ public class EditWindow extends javax.swing.JFrame {
         });
 
         btn_SaveKeywords.setText("Save Keywords");
+        btn_SaveKeywords.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_SaveKeywordsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -141,7 +158,7 @@ public class EditWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_ReplaceFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(btn_Browse)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -184,7 +201,7 @@ public class EditWindow extends javax.swing.JFrame {
                     .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_Browse))
                 .addGap(18, 18, 18)
-                .addComponent(jButton4)
+                .addComponent(btn_ReplaceFile)
                 .addGap(129, 129, 129))
         );
 
@@ -218,8 +235,49 @@ public class EditWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_BrowseActionPerformed
 
     private void btn_RevealKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RevealKeywordsActionPerformed
+        try
+        {
+            StringBuilder sb = crypto.Crypto.keyAESdec(currentFile, searchPasswordField.getPassword());
+            Vector<String> fileKeys = crypto.SSE2.parseKeys(sb);
 
+            for(int i = 0; i < fileKeys.size(); i++)
+            {
+                keywordsModel.addElement(fileKeys.elementAt(i));
+            }
+        }
+        catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
+
+    private void btn_SaveKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SaveKeywordsActionPerformed
+        try
+        {
+            crypto.Crypto.fileAESenc(currentFile, currentFile, searchPasswordField.getPassword(), true); //true means we always delete original
+            
+            String deleteMe = currentFile.getAbsolutePath().toString();
+            //System.out.println("Save Keywords Delete Old File Path: "+deleteMe);
+
+            //the below 2 lines prepare the string for dropbox use
+            deleteMe = deleteMe.substring(deleteMe.indexOf("\\" + MainWindow.userName)+1, deleteMe.length());
+            //System.out.println("deleteme ="+deleteMe);
+            deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length());
+            //System.out.println("Delete Path Passed to DAPI: " + deleteMe);
+
+            //delete original file that has old keywords from dropbox
+            MainWindow.DAPI.delete(deleteMe);
+
+            //push new file with new keywords to dropbox
+            MainWindow.pushFile(currentFile);            
+        }
+        catch(Exception e){e.printStackTrace();}
+    }//GEN-LAST:event_btn_SaveKeywordsActionPerformed
+
+    private void searchPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPasswordFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchPasswordFieldActionPerformed
+
+    private void btn_ReplaceFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ReplaceFileActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_ReplaceFileActionPerformed
 
     /**
     * @param args the command line arguments
@@ -234,12 +292,12 @@ public class EditWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Browse;
+    private javax.swing.JButton btn_ReplaceFile;
     private javax.swing.JButton btn_RevealKeywords;
     private javax.swing.JButton btn_SaveKeywords;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
