@@ -45,15 +45,11 @@ import javax.swing.JTree;
  * Created on Nov 7, 2011, 10:12:05 PM
  */
 
-/**
- *
- * @author Boardwalk
- */
 public class MainWindow extends javax.swing.JFrame {
     public static String rootPath = new File(".").getAbsolutePath(); //does this always point to Current User's Root Folder? -CQ
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
-    public static String userName = "";
+    public static String userName; //userName is defined in AuthWindow.java
     public static HashMap<String,Date> meta;
 
     public static DefaultListModel searchingForModel;
@@ -115,7 +111,6 @@ public class MainWindow extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         searchPasswordField = new javax.swing.JPasswordField();
-        btn_EnableSearch = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         txtField_SearchForKey = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
@@ -131,6 +126,11 @@ public class MainWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jButton1.setText("Add File");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         btn_RemoveFile.setText("Remove File");
         btn_RemoveFile.addActionListener(new java.awt.event.ActionListener() {
@@ -158,13 +158,6 @@ public class MainWindow extends javax.swing.JFrame {
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jLabel2.setText("Search Function Password:");
-
-        btn_EnableSearch.setText("Enable Search");
-        btn_EnableSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_EnableSearchActionPerformed(evt);
-            }
-        });
 
         jLabel3.setText("Keyword To Search For:");
 
@@ -228,7 +221,6 @@ public class MainWindow extends javax.swing.JFrame {
                                         .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(btn_EnableSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -264,9 +256,7 @@ public class MainWindow extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btn_EnableSearch)
-                        .addGap(40, 40, 40)
+                        .addGap(69, 69, 69)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(txtField_SearchForKey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -314,7 +304,7 @@ public class MainWindow extends javax.swing.JFrame {
         System.out.println("DELETE ME: " + jtree.getSelectionPath().toString());
 
         String deleteMe = jtree.getSelectionPath().toString();
-        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1);
+        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1); //length-1 gets rid of bracket
         System.out.println(deleteMe);
 
 
@@ -328,13 +318,13 @@ public class MainWindow extends javax.swing.JFrame {
         }
 
         try{
-        jtree.setVisible(false);
-        jtree.setSelectionPath(null);
-        DAPI.delete(deleteMe);
-        AuthWindow.obtainFiles(new File(userPath));
-        FileTreeModel model = new FileTreeModel(new File(userPath));
-        jtree.setModel(model);
-        jtree.setVisible(true);
+            jtree.setVisible(false);
+            jtree.setSelectionPath(null);
+            DAPI.delete(deleteMe);
+            AuthWindow.obtainFiles(new File(userPath));
+            FileTreeModel model = new FileTreeModel(new File(userPath));
+            jtree.setModel(model);
+            jtree.setVisible(true);
         }catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RemoveFileActionPerformed
 
@@ -370,10 +360,7 @@ public class MainWindow extends javax.swing.JFrame {
                 try
                 {
                     //crypto.Crypto.keyAESdec(editFile, passwordField.getPassword());
-                    System.out.println("1");
                     EditWindow ew = new EditWindow(editFile);
-                    System.out.println("2");
-                    System.out.println("3");
                     ew.setVisible(true);
 
                 }catch (Exception ae){ae.printStackTrace();}
@@ -382,18 +369,13 @@ public class MainWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btn_EditFileKeywordsActionPerformed
 
-    private void btn_EnableSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EnableSearchActionPerformed
-        // TODO add your handling code here:
-
-    }//GEN-LAST:event_btn_EnableSearchActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String keyToAdd = txtField_SearchForKey.getText();
         searchingForModel.addElement(keyToAdd);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
-                char[] searchKey = searchPasswordField.getPassword();
+        char[] searchKey = searchPasswordField.getPassword();
         if (searchKey.length == 0) //is null
         {
             System.out.println("No search key entered");
@@ -426,6 +408,10 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -451,7 +437,6 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_EditFileKeywords;
-    private javax.swing.JButton btn_EnableSearch;
     private javax.swing.JButton btn_RemoveFile;
     private javax.swing.JButton btn_Search;
     private javax.swing.JButton jButton1;
