@@ -28,16 +28,14 @@ public class EditWindow extends javax.swing.JFrame {
 
     /** Creates new form EditWindow */
     public EditWindow() {
-        initComponents();
-        keywordsModel = new DefaultListModel();
-        list_Keywords.setModel(keywordsMOdel);
-        
+        //EDITWINDOW SHOULD ONLY BE CALLED WITH A FILE PASSED TO IT
     }
 
     public EditWindow(File passedFile) {
         initComponents();
         currentFile = passedFile;
-        System.out.println("Currently working on : " + currentFile.getAbsolutePath().toString());
+        keywordsModel = new DefaultListModel();
+        list_Keywords.setModel(keywordsModel);
     }
 
     /** This method is called from within the constructor to
@@ -56,7 +54,7 @@ public class EditWindow extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         txtField_newKeyword = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btn_Decrypt = new javax.swing.JButton();
         btn_ReplaceFile = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         btn_Browse = new javax.swing.JButton();
@@ -65,6 +63,9 @@ public class EditWindow extends javax.swing.JFrame {
         searchPasswordField = new javax.swing.JPasswordField();
         btn_RevealKeywords = new javax.swing.JButton();
         btn_SaveKeywords = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        btn_Browse1 = new javax.swing.JButton();
+        txtField_DecryptBrowse = new javax.swing.JTextField();
 
         jLabel1.setText("File Keywords:");
 
@@ -81,10 +82,10 @@ public class EditWindow extends javax.swing.JFrame {
 
         jButton2.setText("Add New Keyword");
 
-        jButton3.setText("Decrypt File To A Location");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btn_Decrypt.setText("Decrypt File To Location");
+        btn_Decrypt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btn_DecryptActionPerformed(evt);
             }
         });
 
@@ -104,7 +105,7 @@ public class EditWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("Search Password:");
+        jLabel2.setText("File Password:");
 
         searchPasswordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -126,58 +127,86 @@ public class EditWindow extends javax.swing.JFrame {
             }
         });
 
+        btn_Browse1.setText("Browse");
+        btn_Browse1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_Browse1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(jLabel3)
                         .addGap(102, 102, 102))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(123, 123, 123)
-                        .addComponent(jLabel1))
+                    .addComponent(btn_RevealKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addGap(144, 144, 144))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btn_SaveKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                            .addComponent(btn_RevealKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(3, 3, 3)
-                                .addComponent(searchPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                            .addComponent(txtField_newKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
+                            .addComponent(btn_SaveKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(txtField_newKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE))
                         .addGap(10, 10, 10)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(btn_ReplaceFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                             .addComponent(btn_Browse)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(btn_Decrypt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_Browse1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtField_DecryptBrowse, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(234, 234, 234)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                .addGap(171, 171, 171))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btn_Browse1)
+                            .addComponent(txtField_DecryptBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_Decrypt)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btn_Browse)
+                            .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_ReplaceFile))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
                         .addComponent(btn_RevealKeywords)
-                        .addGap(14, 14, 14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -187,41 +216,25 @@ public class EditWindow extends javax.swing.JFrame {
                         .addComponent(txtField_newKeyword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_SaveKeywords))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 469, Short.MAX_VALUE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(113, 113, 113)
-                .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 162, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_Browse))
-                .addGap(18, 18, 18)
-                .addComponent(btn_ReplaceFile)
-                .addGap(129, 129, 129))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        JFileChooser fc = new JFileChooser();
-        fc.showSaveDialog(this);
+    private void btn_DecryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DecryptActionPerformed
         try
         {
-            System.out.println("User chose to save at " + fc.getSelectedFile().getAbsolutePath().toString());
-
-            File saveFile = new File(fc.getSelectedFile().getAbsolutePath().toString());
-
+            File saveAs = new File(txtField_Browse.getText().toString());
+            crypto.Crypto.fileAESenc(currentFile, saveAs, searchPasswordField.getPassword(), true);
+        }catch(Exception e){e.printStackTrace();}
             
-            
-        }catch (Exception e){}
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btn_DecryptActionPerformed
 
     private void btn_BrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_BrowseActionPerformed
         // TODO add your handling code here:
@@ -251,22 +264,7 @@ public class EditWindow extends javax.swing.JFrame {
     private void btn_SaveKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SaveKeywordsActionPerformed
         try
         {
-            crypto.Crypto.fileAESenc(currentFile, currentFile, searchPasswordField.getPassword(), true); //true means we always delete original
-            
-            String deleteMe = currentFile.getAbsolutePath().toString();
-            //System.out.println("Save Keywords Delete Old File Path: "+deleteMe);
-
-            //the below 2 lines prepare the string for dropbox use
-            deleteMe = deleteMe.substring(deleteMe.indexOf("\\" + MainWindow.userName)+1, deleteMe.length());
-            //System.out.println("deleteme ="+deleteMe);
-            deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length());
-            //System.out.println("Delete Path Passed to DAPI: " + deleteMe);
-
-            //delete original file that has old keywords from dropbox
-            MainWindow.DAPI.delete(deleteMe);
-
-            //push new file with new keywords to dropbox
-            MainWindow.pushFile(currentFile);            
+        
         }
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_SaveKeywordsActionPerformed
@@ -276,8 +274,34 @@ public class EditWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_searchPasswordFieldActionPerformed
 
     private void btn_ReplaceFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ReplaceFileActionPerformed
-        // TODO add your handling code here:
+        try
+        {
+            //delete original file from dropbox
+            MainWindow.DAPI.delete(currentFile);
+
+            //push new file  to dropbox
+            File uploadFile = new File(txtField_Browse.getText());
+            File decryptedUploadFile = new File("path_to_file");
+
+            crypto.Crypto.fileAESenc(uploadFile, decryptedUploadFile, searchPasswordField.getPassword(), true); //true means we always delete original
+
+            //push new file with new keywords to dropbox
+            MainWindow.pushFile(currentFile);    
+            MainWindow.pushFile(currentFile);
+        }catch (Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_ReplaceFileActionPerformed
+
+    private void btn_Browse1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_Browse1ActionPerformed
+        // TODO add your handling code here:
+        JFileChooser fc = new JFileChooser();
+        fc.showSaveDialog(this);
+        try
+        {
+            txtField_DecryptBrowse.setText(fc.getSelectedFile().getAbsolutePath().toString());
+            //File saveFile = new File(fc.getSelectedFile().getAbsolutePath().toString());
+        }
+        catch(Exception e){e.printStackTrace();}
+    }//GEN-LAST:event_btn_Browse1ActionPerformed
 
     /**
     * @param args the command line arguments
@@ -292,20 +316,23 @@ public class EditWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Browse;
+    private javax.swing.JButton btn_Browse1;
+    private javax.swing.JButton btn_Decrypt;
     private javax.swing.JButton btn_ReplaceFile;
     private javax.swing.JButton btn_RevealKeywords;
     private javax.swing.JButton btn_SaveKeywords;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JList list_Keywords;
     private javax.swing.JPasswordField searchPasswordField;
     private javax.swing.JTextField txtField_Browse;
+    private javax.swing.JTextField txtField_DecryptBrowse;
     private javax.swing.JTextField txtField_newKeyword;
     // End of variables declaration//GEN-END:variables
 
