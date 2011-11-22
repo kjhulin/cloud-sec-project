@@ -34,8 +34,8 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="btn_SaveKeywords" alignment="0" pref="339" max="32767" attributes="0"/>
-                          <Component id="jButton1" alignment="0" pref="339" max="32767" attributes="1"/>
-                          <Component id="jButton2" alignment="0" pref="339" max="32767" attributes="0"/>
+                          <Component id="btn_DeleteKeyword" alignment="0" pref="339" max="32767" attributes="1"/>
+                          <Component id="btn_AddKeyword" alignment="0" pref="339" max="32767" attributes="0"/>
                           <Component id="jScrollPane1" alignment="0" pref="339" max="32767" attributes="0"/>
                           <Component id="txtField_newKeyword" alignment="0" pref="339" max="32767" attributes="0"/>
                       </Group>
@@ -112,9 +112,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtField_newKeyword" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                      <Component id="btn_AddKeyword" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btn_DeleteKeyword" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btn_SaveKeywords" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -153,10 +153,13 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="btn_DeleteKeyword">
       <Properties>
         <Property name="text" type="java.lang.String" value="Delete Selected Keyword"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_DeleteKeywordActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
@@ -165,10 +168,13 @@
     </Component>
     <Component class="javax.swing.JTextField" name="txtField_newKeyword">
     </Component>
-    <Component class="javax.swing.JButton" name="jButton2">
+    <Component class="javax.swing.JButton" name="btn_AddKeyword">
       <Properties>
         <Property name="text" type="java.lang.String" value="Add New Keyword"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_AddKeywordActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btn_Decrypt">
       <Properties>

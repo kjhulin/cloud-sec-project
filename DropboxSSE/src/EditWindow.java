@@ -50,10 +50,10 @@ public class EditWindow extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         list_Keywords = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        btn_DeleteKeyword = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         txtField_newKeyword = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        btn_AddKeyword = new javax.swing.JButton();
         btn_Decrypt = new javax.swing.JButton();
         btn_ReplaceFile = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
@@ -76,11 +76,21 @@ public class EditWindow extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(list_Keywords);
 
-        jButton1.setText("Delete Selected Keyword");
+        btn_DeleteKeyword.setText("Delete Selected Keyword");
+        btn_DeleteKeyword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_DeleteKeywordActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("New Keyword:");
 
-        jButton2.setText("Add New Keyword");
+        btn_AddKeyword.setText("Add New Keyword");
+        btn_AddKeyword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_AddKeywordActionPerformed(evt);
+            }
+        });
 
         btn_Decrypt.setText("Decrypt File To Location");
         btn_Decrypt.addActionListener(new java.awt.event.ActionListener() {
@@ -151,8 +161,8 @@ public class EditWindow extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(btn_SaveKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(btn_DeleteKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                            .addComponent(btn_AddKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
                             .addComponent(txtField_newKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE))
                         .addGap(10, 10, 10)))
@@ -215,9 +225,9 @@ public class EditWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtField_newKeyword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)
+                        .addComponent(btn_AddKeyword)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
+                        .addComponent(btn_DeleteKeyword)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btn_SaveKeywords))
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
@@ -237,7 +247,6 @@ public class EditWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_DecryptActionPerformed
 
     private void btn_BrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_BrowseActionPerformed
-        // TODO add your handling code here:
         JFileChooser fc = new JFileChooser();
         fc.showOpenDialog(this);
         try
@@ -303,6 +312,32 @@ public class EditWindow extends javax.swing.JFrame {
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_Browse1ActionPerformed
 
+    private void btn_AddKeywordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddKeywordActionPerformed
+        String newKeyword = txtField_newKeyword.getText();
+        if(newKeyword.length() == 0)
+        {
+            System.out.println("no keyword entered");
+        }
+        else
+        {
+            txtField_newKeyword.setText("");
+            keywordsModel.addElement(newKeyword);
+        }
+    }//GEN-LAST:event_btn_AddKeywordActionPerformed
+
+    private void btn_DeleteKeywordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DeleteKeywordActionPerformed
+        int selectedIndex = list_Keywords.getSelectedIndex();
+        if (selectedIndex != -1)
+        {
+            keywordsModel.remove(selectedIndex);
+        }
+        else
+        {
+            System.out.println("Please select keyword to delete");
+        }
+
+    }//GEN-LAST:event_btn_DeleteKeywordActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -315,14 +350,14 @@ public class EditWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_AddKeyword;
     private javax.swing.JButton btn_Browse;
     private javax.swing.JButton btn_Browse1;
     private javax.swing.JButton btn_Decrypt;
+    private javax.swing.JButton btn_DeleteKeyword;
     private javax.swing.JButton btn_ReplaceFile;
     private javax.swing.JButton btn_RevealKeywords;
     private javax.swing.JButton btn_SaveKeywords;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
