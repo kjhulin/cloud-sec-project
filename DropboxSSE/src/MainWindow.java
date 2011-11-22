@@ -362,6 +362,7 @@ public class MainWindow extends javax.swing.JFrame {
                     //crypto.Crypto.keyAESdec(editFile, passwordField.getPassword());
                     EditWindow ew = new EditWindow(editFile);
                     ew.setVisible(true);
+                    ew.setTitle(editFile.getAbsolutePath());
 
                 }catch (Exception ae){ae.printStackTrace();}
             }
