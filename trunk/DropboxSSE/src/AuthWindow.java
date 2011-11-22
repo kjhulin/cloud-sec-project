@@ -259,7 +259,7 @@ public class AuthWindow extends javax.swing.JFrame {
             for(Entry e : listDirectory(s)){
 
                 if(e.isDir){
-                    System.out.println(e.fileName());
+                    System.out.println("e.fileName() == " + e.fileName());
                     System.out.println("eParentPath: "+e.parentPath());
                     File path = new File(uPath.toString() + File.separator + e.fileName());
                     System.out.println("PATH: "+path.getAbsolutePath().toString());
@@ -268,12 +268,12 @@ public class AuthWindow extends javax.swing.JFrame {
                     }
                     getFolderContents(e.parentPath() + e.fileName(), path);
                 }else{
-                    System.out.println(e.fileName());
+                    System.out.println("e.fileName() == " + e.fileName());
                     System.out.println("PARENT PATH: " + e.parentPath());
 
                     File downloadPath = new File(uPath.toString() + File.separator + e.fileName());
                     Date dateModified = df.parse(e.modified);
-                    System.out.println(dateModified.toString());
+                    System.out.println("date modified: " + dateModified.toString());
                     System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
                     String dbPath = e.parentPath()+e.fileName();
                     if(!MainWindow.meta.containsKey(dbPath) ||
@@ -309,7 +309,7 @@ public class AuthWindow extends javax.swing.JFrame {
         
         //AccessTokenPair atp = authWAS.getAccessTokenPair();
         MainWindow.userName = lbl_currentUser.getText();
-        System.out.println(lbl_currentUser.getText());
+        System.out.println("lbl_current_user == " + lbl_currentUser.getText());
         File userFolder = new File(lbl_currentUser.getText());
         if(userFolder.exists())
         {
@@ -417,7 +417,7 @@ class FileTreeModel implements TreeModel {
   public int getChildCount(Object parent) {
       
     String[] children = ((File)parent).list(ff);
-    System.out.println(Arrays.toString(children));
+    //System.out.println("printing children array: " + Arrays.toString(children));
     if (children == null) return 0;
     return children.length;
   }
