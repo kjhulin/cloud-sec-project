@@ -86,7 +86,7 @@ public class MainWindow extends javax.swing.JFrame {
     
     public static Entry pushFile(File f) throws Exception{
         String dbPath = f.getAbsolutePath().replace(rootPath,"");
-        System.out.println(dbPath);
+        System.out.println("dbpath: " + dbPath);
         return DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
     
     }
@@ -101,7 +101,7 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        btn_AddFile = new javax.swing.JButton();
         btn_RemoveFile = new javax.swing.JButton();
         btn_EditFileKeywords = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -113,7 +113,7 @@ public class MainWindow extends javax.swing.JFrame {
         searchPasswordField = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
         txtField_SearchForKey = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        btn_AddKeyToSearchFor = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         list_SearchingFor = new javax.swing.JList();
         jLabel4 = new javax.swing.JLabel();
@@ -122,13 +122,14 @@ public class MainWindow extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         list_Results = new javax.swing.JList();
         jSeparator2 = new javax.swing.JSeparator();
+        btn_RemoveSearchKey = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("Add File");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btn_AddFile.setText("Add File In Currently Selected Directory");
+        btn_AddFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btn_AddFileActionPerformed(evt);
             }
         });
 
@@ -146,11 +147,6 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        jtree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
-            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                jtreeValueChanged(evt);
-            }
-        });
         jScrollPane1.setViewportView(jtree);
 
         jLabel1.setText("File Password:");
@@ -161,10 +157,10 @@ public class MainWindow extends javax.swing.JFrame {
 
         jLabel3.setText("Keyword To Search For:");
 
-        jButton2.setText("Add Key To Search List");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btn_AddKeyToSearchFor.setText("Add Key To Search List");
+        btn_AddKeyToSearchFor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btn_AddKeyToSearchForActionPerformed(evt);
             }
         });
 
@@ -193,6 +189,13 @@ public class MainWindow extends javax.swing.JFrame {
         });
         jScrollPane3.setViewportView(list_Results);
 
+        btn_RemoveSearchKey.setText("Remove Selected Key From List");
+        btn_RemoveSearchKey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_RemoveSearchKeyActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -202,46 +205,47 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btn_EditFileKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_AddFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
                     .addComponent(btn_RemoveFile, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator2))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(searchPasswordField))
+                                    .addComponent(btn_AddKeyToSearchFor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel3)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(txtField_SearchForKey))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(79, 79, 79)
-                                        .addComponent(btn_Search))
-                                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(52, 52, 52)
-                                .addComponent(jLabel4))
+                                        .addGap(26, 26, 26)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(btn_Search, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(btn_RemoveSearchKey, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(46, 46, 46)
+                                        .addComponent(jLabel4))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(196, 196, 196)
-                                .addComponent(jLabel5)))
-                        .addContainerGap())
+                                .addComponent(jLabel5))
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE))))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(86, 86, 86))))
+                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -256,29 +260,31 @@ public class MainWindow extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(69, 69, 69)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(txtField_SearchForKey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addComponent(btn_AddKeyToSearchFor)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(btn_RemoveSearchKey)
+                                .addGap(18, 18, 18)
                                 .addComponent(btn_Search)
-                                .addGap(30, 30, 30)
-                                .addComponent(jLabel5)
-                                .addGap(3, 3, 3)))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(31, 31, 31)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15)
-                .addComponent(jButton1)
+                .addComponent(btn_AddFile)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_EditFileKeywords)
@@ -292,20 +298,12 @@ public class MainWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jtreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jtreeValueChanged
-        // TODO add your handling code here:
-        //System.out.println(jtree.getSelectionPath().toString());
-
-
-    }//GEN-LAST:event_jtreeValueChanged
-
     private void btn_RemoveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveFileActionPerformed
-        // TODO add your handling code here:
-        System.out.println("DELETE ME: " + jtree.getSelectionPath().toString());
+        System.out.println("delete me is: " + jtree.getSelectionPath().toString());
 
         String deleteMe = jtree.getSelectionPath().toString();
         deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1); //length-1 gets rid of bracket
-        System.out.println(deleteMe);
+        System.out.println("delete me is now: " + deleteMe);
 
 
         String userPath = jtree.getSelectionPath().toString();
@@ -370,10 +368,11 @@ public class MainWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btn_EditFileKeywordsActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btn_AddKeyToSearchForActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddKeyToSearchForActionPerformed
         String keyToAdd = txtField_SearchForKey.getText();
+        txtField_SearchForKey.setText("");
         searchingForModel.addElement(keyToAdd);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btn_AddKeyToSearchForActionPerformed
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
         char[] searchKey = searchPasswordField.getPassword();
@@ -409,9 +408,59 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btn_AddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddFileActionPerformed
+        String dropboxAddPath = jtree.getSelectionPath().toString();
+        boolean folderSelected = false;
+        boolean rootSelected = false;
+
+        if(!dropboxAddPath.contains(userName+"\\"))
+        {
+            dropboxAddPath = dropboxAddPath.substring(1);
+            rootSelected = true;
+        }
+        else
+        {
+            int cutoff = userName.length();
+            dropboxAddPath = dropboxAddPath.substring(dropboxAddPath.indexOf(userName+"\\")+cutoff);
+        }
+        dropboxAddPath = dropboxAddPath.substring(0, dropboxAddPath.length()-1);
+        
+        String selectedFileLocation = "";
+        if(rootSelected == false)
+        {
+            selectedFileLocation = AuthWindow.currentUserPath + dropboxAddPath;
+        }
+        else
+        {
+            selectedFileLocation = AuthWindow.currentUserPath;
+        }
+        System.out.println("file's local location = " + selectedFileLocation);
+        System.out.println("dropboxAddPath = "+ dropboxAddPath);
+        File isFolder = new File(selectedFileLocation);
+        if (isFolder.isDirectory()== true)
+        {
+            System.out.println("user has selected a folder");
+            folderSelected = true;
+        }
+
+/*
+        System.out.println("Note to self: force user to select a directory?");
+        System.out.println("Note to self: figure out if we need the \\ or not");
+ * */
+ 
+    }//GEN-LAST:event_btn_AddFileActionPerformed
+
+    private void btn_RemoveSearchKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveSearchKeyActionPerformed
+        int selectedIndex = list_SearchingFor.getSelectedIndex();
+        if (selectedIndex != -1)
+        {
+            searchingForModel.remove(selectedIndex);
+        }
+        else
+        {
+            System.out.println("Please select keyword to delete");
+        }
+    }//GEN-LAST:event_btn_RemoveSearchKeyActionPerformed
 
     /**
     * @param args the command line arguments
@@ -437,11 +486,12 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_AddFile;
+    private javax.swing.JButton btn_AddKeyToSearchFor;
     private javax.swing.JButton btn_EditFileKeywords;
     private javax.swing.JButton btn_RemoveFile;
+    private javax.swing.JButton btn_RemoveSearchKey;
     private javax.swing.JButton btn_Search;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
