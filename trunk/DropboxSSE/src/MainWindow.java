@@ -53,7 +53,7 @@ import javax.swing.JTree;
 public class MainWindow extends javax.swing.JFrame {
     public static SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss ZZZZZ");
     public static String rootPath = new File(".").getAbsolutePath(); //does this always point to Current User's Root Folder? -CQ
-    
+
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
     public static String userName; //userName is defined in AuthWindow.java
@@ -62,7 +62,7 @@ public class MainWindow extends javax.swing.JFrame {
     public static DefaultListModel searchingForModel;
     public static DefaultListModel resultsModel;
 
-    
+
     /** Creates new form MainWindow */
     public MainWindow() {
         if(rootPath.endsWith("\\.")){
@@ -73,10 +73,10 @@ public class MainWindow extends javax.swing.JFrame {
         resultsModel = new DefaultListModel();
         list_SearchingFor.setModel(searchingForModel);
         list_Results.setModel(resultsModel);
-        
+
         AuthWindow aw = new AuthWindow();
         aw.setVisible(true);
-       
+
 
     }
     //Map dropbox string path + dateMod
@@ -99,18 +99,18 @@ public class MainWindow extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
+
     public static Entry pushFile(File f) throws Exception{
         String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\","/");
-        
+
         //String dbPath = getDBPathFromTree();
         System.out.println("Pusing file " + f.getAbsolutePath() + " to dbpath: " + dbPath);
         Entry e = DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
         updateMeta(dbPath,df.parse(e.modified));
         return e;
-    
+
     }
-    
+
     public static void deleteFile(File f) throws Exception{
         System.out.println("file path: " + f.getAbsolutePath());
         System.out.println("rootPath: " + rootPath.replace("\\","\\\\")+userName);
@@ -120,12 +120,12 @@ public class MainWindow extends javax.swing.JFrame {
         DAPI.delete(dbPath);
         updateMeta(dbPath,null);
         refreshTree();
-        
+
     }
 
 
     public static String getUserPathFromTree(){
-        
+
         String treePath = jtree.getSelectionPath().getLastPathComponent().toString();
         return treePath;
     }
@@ -137,7 +137,7 @@ public class MainWindow extends javax.swing.JFrame {
         if(s.contains(File.separator)){
             s = s.substring(s.indexOf(File.separator)).replace(File.separator,"/");
         }
-       
+
         return s;
     }
     /** This method is called from within the constructor to
@@ -350,10 +350,10 @@ public class MainWindow extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-   
+
     private void btn_RemoveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveFileActionPerformed
 //        System.out.println("delete me is: " + jtree.getSelectionPath().toString());
-//        
+//
 //        String deleteMe = jtree.getSelectionPath().toString();
 //        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1); //length-1 gets rid of bracket
 //        System.out.println("delete me is now: " + deleteMe);
@@ -377,7 +377,7 @@ public class MainWindow extends javax.swing.JFrame {
 //        try{
 //            jtree.setVisible(false);
 //            jtree.setSelectionPath(null);
-//            
+//
 //            AuthWindow.obtainFiles(new File(userPath));
 //            FileTreeModel model = new FileTreeModel(new File(userPath));
 //            jtree.setModel(model);
@@ -389,7 +389,7 @@ public class MainWindow extends javax.swing.JFrame {
         AuthWindow.obtainFiles(new File(userName));
         FileTreeModel model = new FileTreeModel(new File(userName));
         jtree.setModel(model);
-        jtree.setVisible(true); 
+        jtree.setVisible(true);
     }
     private void btn_EditFileKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EditFileKeywordsActionPerformed
         // TODO add your handling code here:
@@ -420,9 +420,9 @@ public class MainWindow extends javax.swing.JFrame {
                 try
                 {
                     File SSEfile = new File(editFile.getAbsolutePath()+Crypto.EXT);
-                    
+
                     if(!SSEfile.exists()){
-                        
+
                         //String searchKey = JOptionPane.showInputDialog(this,"SSE File not found! Enter the SSE Search password to create it:","Search Password",0);
                         //TODO: Verify searchKey against Database?
                         JOptionPane.showMessageDialog(this,"SSE File not found! Generating search file from provided password\nTODO:Verifying Search Key (against DB?) here");
@@ -430,7 +430,7 @@ public class MainWindow extends javax.swing.JFrame {
                         //Push encrypted file to dropbox
                         pushFile(SSEfile);
                     }
-                    
+
                     if(!Crypto.verifyHMAC(SSEfile, passwordField.getPassword())){
                         JOptionPane.showMessageDialog(this,"Invalid search password");
                         return;
@@ -447,7 +447,7 @@ public class MainWindow extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btn_EditFileKeywordsActionPerformed
-    
+
     private void btn_AddKeyToSearchForActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddKeyToSearchForActionPerformed
         if(!SSE2.isValidKeyword(txtField_SearchForKey.getText())){
             JOptionPane.showMessageDialog(this,"Invalid keyword:  Must follow the pattern: " + SSE2.keywordRegex);
@@ -469,8 +469,10 @@ public class MainWindow extends javax.swing.JFrame {
         {
             try
             {
-                String userPath = rootPath+ File.separator + userName;
-                
+                //String userPath = rootPath+ File.separator + userName;
+                String userPath = rootPath + userName + File.pathSeparatorChar;
+                System.out.println("USER PATH: " + userPath);
+
                 crypto.SSE2.createDatabase(searchKey,userPath);
                 File userRootPath = new File(userPath);
                 crypto.SSE2.buildIndex(userRootPath, searchKey);
@@ -515,7 +517,7 @@ public class MainWindow extends javax.swing.JFrame {
 //            dropboxAddPath = dropboxAddPath.substring(dropboxAddPath.indexOf(userName+"\\")+cutoff);
 //        }
 //        dropboxAddPath = dropboxAddPath.substring(0, dropboxAddPath.length()-1);
-//        
+//
 //        String selectedFileLocation = "";
 //        if(rootSelected == false)
 //        {
@@ -531,23 +533,23 @@ public class MainWindow extends javax.swing.JFrame {
         if(!new File(getUserPathFromTree()).isDirectory()){//If file is selected, select file parent
             jtree.setSelectionPath(jtree.getSelectionPath().getParentPath());
         }
-        
+
         String userLocation = getUserPathFromTree();
         String DBLocation = getDBPathFromTree();
         System.out.println("file's local location = " + userLocation);
         System.out.println("dropboxAddPath = "+ DBLocation);
 
-        
+
         JFileChooser jfc = new JFileChooser("");
         jfc.showOpenDialog(this);
         File f = jfc.getSelectedFile();
-        
+
         if(f == null){
             System.err.println("Did not choose a file");
             return;
         }
         System.out.println(f.getAbsolutePath());
-        
+
         try{
             //Create encrypted version of file in user SecDB directory
             File destination = new File(userLocation + File.separator+f.getName());
@@ -560,15 +562,15 @@ public class MainWindow extends javax.swing.JFrame {
             System.out.println(searchFile.getAbsolutePath());
             pushFile(searchFile);
             refreshTree();
-            
+
         }catch(Exception e){System.err.println("Error encrypting and pushing file"); e.printStackTrace();}
-        
-        
-/*      
+
+
+/*
         System.out.println("Note to self: force user to select a directory?");
         System.out.println("Note to self: figure out if we need the \\ or not");
  * */
- 
+
     }//GEN-LAST:event_btn_AddFileActionPerformed
 
     private void btn_RemoveSearchKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveSearchKeyActionPerformed
