@@ -1,9 +1,14 @@
 
+import crypto.Crypto;
+import crypto.SSE2;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /*
  * To change this template, choose Tools | Templates
@@ -18,12 +23,13 @@ import javax.swing.JFileChooser;
 
 /**
  *
- * @author Boardwalk
+ * @author Boardwalk, Maligare
  */
 public class EditWindow extends javax.swing.JFrame {
 
     public static EditWindow ew;
-    public File currentFile; //file currently being edited
+    private File currentFile; //file currently being edited
+    private char[] searchKey;
     public static DefaultListModel keywordsModel;
 
     /** Creates new form EditWindow */
@@ -31,11 +37,22 @@ public class EditWindow extends javax.swing.JFrame {
         //EDITWINDOW SHOULD ONLY BE CALLED WITH A FILE PASSED TO IT
     }
 
-    public EditWindow(File passedFile) {
+    public EditWindow(File passedFile,char[] searchPass) {
         initComponents();
         currentFile = passedFile;
+        //sseFile = new File(currentFile.getAbsoluteFile()+Crypto.EXT);
+        searchKey = searchPass;
+        
         keywordsModel = new DefaultListModel();
         list_Keywords.setModel(keywordsModel);
+        try{
+            System.out.println(Arrays.toString(searchPass));
+            Vector<String> s = SSE2.parseKeys(Crypto.keyAESdec(currentFile, searchPass.clone()));
+            for(String t : s){
+                keywordsModel.addElement(t);
+            }
+            System.out.println("Added keywords to keyword list field");
+        }catch(Exception e){e.printStackTrace();}
     }
 
     /** This method is called from within the constructor to
@@ -60,12 +77,14 @@ public class EditWindow extends javax.swing.JFrame {
         btn_Browse = new javax.swing.JButton();
         txtField_Browse = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        searchPasswordField = new javax.swing.JPasswordField();
+        filePasswordField = new javax.swing.JPasswordField();
         btn_RevealKeywords = new javax.swing.JButton();
         btn_SaveKeywords = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
         btn_Browse1 = new javax.swing.JButton();
         txtField_DecryptBrowse = new javax.swing.JTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jCheckBox2 = new javax.swing.JCheckBox();
 
         jLabel1.setText("File Keywords:");
 
@@ -117,13 +136,13 @@ public class EditWindow extends javax.swing.JFrame {
 
         jLabel2.setText("File Password:");
 
-        searchPasswordField.addActionListener(new java.awt.event.ActionListener() {
+        filePasswordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                searchPasswordFieldActionPerformed(evt);
+                filePasswordFieldActionPerformed(evt);
             }
         });
 
-        btn_RevealKeywords.setText("Reveal File Keywords");
+        btn_RevealKeywords.setText("Revert To Stored Keyword List");
         btn_RevealKeywords.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_RevealKeywordsActionPerformed(evt);
@@ -144,6 +163,16 @@ public class EditWindow extends javax.swing.JFrame {
             }
         });
 
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Open file for editing after save");
+
+        jCheckBox2.setText("Securely delete plaintext file after uploading");
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -154,47 +183,48 @@ public class EditWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(102, 102, 102))
-                    .addComponent(btn_RevealKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
+                    .addComponent(btn_RevealKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(144, 144, 144))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btn_SaveKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(btn_DeleteKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(btn_AddKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-                            .addComponent(txtField_newKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE))
+                            .addComponent(btn_SaveKeywords, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                            .addComponent(btn_DeleteKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                            .addComponent(btn_AddKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                            .addComponent(txtField_newKeyword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
                         .addGap(10, 10, 10)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(btn_ReplaceFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(btn_Browse)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(btn_Decrypt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(btn_Browse)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(btn_Browse1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtField_DecryptBrowse, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)))
+                        .addComponent(txtField_DecryptBrowse, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE))
+                    .addComponent(btn_Decrypt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                    .addComponent(jCheckBox1)
+                    .addComponent(btn_ReplaceFile, javax.swing.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+                    .addComponent(jCheckBox2))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(234, 234, 234)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(searchPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
+                .addComponent(filePasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
                 .addGap(171, 171, 171))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(searchPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filePasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addGap(9, 9, 9)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -204,14 +234,18 @@ public class EditWindow extends javax.swing.JFrame {
                             .addComponent(btn_Browse1)
                             .addComponent(txtField_DecryptBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btn_Decrypt)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btn_Browse)
                             .addComponent(txtField_Browse, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(1, 1, 1)
+                        .addComponent(jCheckBox2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btn_ReplaceFile))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(8, 8, 8)
@@ -240,8 +274,38 @@ public class EditWindow extends javax.swing.JFrame {
     private void btn_DecryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DecryptActionPerformed
         try
         {
-            File saveAs = new File(txtField_Browse.getText().toString());
-            crypto.Crypto.fileAESdec(currentFile, saveAs, searchPasswordField.getPassword());
+            if(filePasswordField.getPassword().length==0){
+                JOptionPane.showMessageDialog(this, "No password entered!");
+                return;
+            }
+            if(!Crypto.verifyHMAC(currentFile, filePasswordField.getPassword())){
+                JOptionPane.showMessageDialog(this,"Wrong password!");
+                return;
+            }
+            if(txtField_DecryptBrowse.getText().length()==0){
+                JOptionPane.showMessageDialog(this,"Select a location to save the decrypted file!");
+                btn_Browse1ActionPerformed(evt);
+                return;
+            }
+            File saveAs = new File(txtField_DecryptBrowse.getText().toString());
+            if(saveAs == null){
+                return;
+            }
+            System.out.println("Save location: " + saveAs.getAbsolutePath());
+            if(saveAs.exists()){
+                Object[] options = { "OK", "CANCEL" };
+                int t = JOptionPane.showOptionDialog(null, "Warning! " + saveAs.getName() 
+                            + " already exists!  This action will overwrite it.  Continue?", "Warning",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                            null, options, options[1]);
+                if(t != 0)
+                    return;
+            }
+            crypto.Crypto.fileAESdec(currentFile, saveAs, filePasswordField.getPassword());
+            txtField_Browse.setText(saveAs.getAbsolutePath());
+            if(jCheckBox1.isSelected()){
+                MainWindow.desktop.open(saveAs);
+            }
         }catch(Exception e){e.printStackTrace();}
             
     }//GEN-LAST:event_btn_DecryptActionPerformed
@@ -256,12 +320,19 @@ public class EditWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btn_BrowseActionPerformed
 
+    
+    /**
+     * Reverts to keyword list stored in SSE file
+     * @param evt 
+     */
     private void btn_RevealKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RevealKeywordsActionPerformed
         try
-        {
-            StringBuilder sb = crypto.Crypto.keyAESdec(currentFile, searchPasswordField.getPassword());
-            Vector<String> fileKeys = crypto.SSE2.parseKeys(sb);
+        {   
 
+            StringBuilder sb = crypto.Crypto.keyAESdec(currentFile, searchKey.clone());
+            Vector<String> fileKeys = crypto.SSE2.parseKeys(sb);
+            
+            keywordsModel.clear();
             for(int i = 0; i < fileKeys.size(); i++)
             {
                 keywordsModel.addElement(fileKeys.elementAt(i));
@@ -270,36 +341,79 @@ public class EditWindow extends javax.swing.JFrame {
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
 
+    
+    /**
+     * Saves keywords list to SSE file 
+     * @param evt 
+     */
     private void btn_SaveKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SaveKeywordsActionPerformed
         try
         {
-        
+// Uncomment to no longer allow empty keyword lists
+//            if(keywordsModel.isEmpty()){
+//                JOptionPane.showMessageDialog(this, "No keywords entered!");
+//                return;
+//            }
+            StringBuilder sb = new StringBuilder("");
+            String s;
+            Enumeration<String> words = (Enumeration<String>) keywordsModel.elements();
+            while(words.hasMoreElements()){
+                sb.append(words.nextElement());
+                if(words.hasMoreElements())sb.append(",");
+            }
+            System.out.println(currentFile.getAbsolutePath());
+            System.out.println(sb.toString());
+            System.out.println(Arrays.toString(searchKey));
+            Crypto.keyAESenc(currentFile, searchKey.clone(), sb);
+            
         }
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_SaveKeywordsActionPerformed
 
-    private void searchPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPasswordFieldActionPerformed
+    private void filePasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filePasswordFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_searchPasswordFieldActionPerformed
+    }//GEN-LAST:event_filePasswordFieldActionPerformed
 
     private void btn_ReplaceFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ReplaceFileActionPerformed
         try
         {
+            
+            if(filePasswordField.getPassword().length==0){
+                JOptionPane.showMessageDialog(this, "Enter the file password!");
+                return;
+            }
+            if(!Crypto.verifyHMAC(currentFile, filePasswordField.getPassword().clone())){
+               JOptionPane.showMessageDialog(this, "Wrong password!"); 
+               return;
+            }
+            
+           if(txtField_Browse.getText().length()==0){
+                JOptionPane.showMessageDialog(this,"Select a location from which load the plaintext file!");
+                btn_BrowseActionPerformed(evt);
+                return;
+            }
+            File openFrom = new File(txtField_Browse.getText().toString());
+            if(openFrom == null){
+                return;
+            }
             //delete original file from dropbox
             MainWindow.deleteFile(currentFile);
-
+            
             //push new file  to dropbox
-            File uploadFile = new File(txtField_Browse.getText());
-            File decryptedUploadFile = new File("path_to_file");
-
-            crypto.Crypto.fileAESenc(uploadFile, decryptedUploadFile, searchPasswordField.getPassword(), true); //true means we always delete original
+            
+            crypto.Crypto.fileAESenc(openFrom, currentFile, filePasswordField.getPassword(), true); //true means we always delete original
 
             //push new file with new keywords to dropbox
-            MainWindow.pushFile(currentFile);    
+            MainWindow.pushFile(currentFile); 
+            JOptionPane.showMessageDialog(this, "File saved!");
+            if(jCheckBox2.isSelected()){
+                Crypto.secureDelete(openFrom);
+            }
            // MainWindow.pushFile(currentFile);
         }catch (Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_ReplaceFileActionPerformed
 
+    //Browse for location to save decrypted file to
     private void btn_Browse1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_Browse1ActionPerformed
         // TODO add your handling code here:
         JFileChooser fc = new JFileChooser();
@@ -309,7 +423,7 @@ public class EditWindow extends javax.swing.JFrame {
             txtField_DecryptBrowse.setText(fc.getSelectedFile().getAbsolutePath().toString());
             //File saveFile = new File(fc.getSelectedFile().getAbsolutePath().toString());
         }
-        catch(Exception e){e.printStackTrace();}
+        catch(Exception e){}
     }//GEN-LAST:event_btn_Browse1ActionPerformed
 
     private void btn_AddKeywordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddKeywordActionPerformed
@@ -320,6 +434,10 @@ public class EditWindow extends javax.swing.JFrame {
         }
         else
         {
+            if(!SSE2.isValidKeyword(newKeyword)){
+                JOptionPane.showMessageDialog(this,"Invalid keyword:  Must follow the pattern: " + SSE2.keywordRegex);
+                return;
+            }
             txtField_newKeyword.setText("");
             keywordsModel.addElement(newKeyword);
         }
@@ -337,6 +455,10 @@ public class EditWindow extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btn_DeleteKeywordActionPerformed
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
 
     /**
     * @param args the command line arguments
@@ -358,6 +480,9 @@ public class EditWindow extends javax.swing.JFrame {
     private javax.swing.JButton btn_ReplaceFile;
     private javax.swing.JButton btn_RevealKeywords;
     private javax.swing.JButton btn_SaveKeywords;
+    private javax.swing.JPasswordField filePasswordField;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -365,7 +490,6 @@ public class EditWindow extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JList list_Keywords;
-    private javax.swing.JPasswordField searchPasswordField;
     private javax.swing.JTextField txtField_Browse;
     private javax.swing.JTextField txtField_DecryptBrowse;
     private javax.swing.JTextField txtField_newKeyword;

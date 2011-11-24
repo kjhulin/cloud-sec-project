@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -157,8 +158,10 @@ public class Crypto
 			file = new RandomAccessFile(src, "r");
 			channel = file.getChannel();
 			len = channel.size() - (SALT_SIZE + IV_SIZE + SALT_SIZE + HMAC_SIZE);
-			channel.position((long)len);
+			System.out.println(len);
+                        channel.position((long)len);
 			buf = ByteBuffer.wrap(fKey);
+                        
 			channel.read(buf);
 			buf = ByteBuffer.wrap(fIV);
 			channel.read(buf);
@@ -166,7 +169,7 @@ public class Crypto
 			file.close();
 		}
 		catch(Exception e)
-		{throw new AlertException("fileAESdec: unable to parse structure");}
+		{e.printStackTrace();throw new AlertException("fileAESdec: unable to parse structure");}
 		
 		if(dest.exists())
 		{
@@ -327,6 +330,7 @@ public class Crypto
 		{
 			file = new RandomAccessFile(src, "rw");
 			channel = file.getChannel();
+                        System.out.println(channel);
 			len = (int) channel.size();
 			channel.position((long)(len - (SALT_SIZE + HMAC_SIZE)));
 			buf = ByteBuffer.wrap(salt);
@@ -337,7 +341,7 @@ public class Crypto
 			file.close();
 		}
 		catch(Exception e)
-		{throw new AlertException("verifyHMAC: unable to parse structure");}
+		{e.printStackTrace();throw new AlertException("verifyHMAC: unable to parse structure");}
 		
 		final byte[] secret = keygen(pass, salt, HMAC_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
@@ -422,10 +426,10 @@ public class Crypto
 	 */
 	public static final StringBuilder keyAESdec(File src, final char[] pass) throws AlertException
 	{
-		File dest = new File(src.getAbsolutePath() + EXT);
+		File source = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
 		
-		fileAESdec(dest,temp,pass.clone());
+		fileAESdec(source,temp,pass.clone());
 		Arrays.fill(pass, (char) 0);
 		
 		StringBuilder str = new StringBuilder();
@@ -442,7 +446,7 @@ public class Crypto
 		}
 		catch(Exception e)
 		{throw new AlertException("keyAESdec: unable to create list");}
-		
+		System.out.println("keyword list: " + str);
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
 		
@@ -631,4 +635,21 @@ public class Crypto
 		return bytes;
 	}
 	// END HELPER METHODS - ABOVE THIS LINE
+
+        
+        /**
+         * Overwrites a file's contents with null bytes 10 times before deleting
+         * @param openFrom
+         * @throws IOException 
+         */
+    public static void secureDelete(File openFrom) throws IOException {
+        for(int t = 0; t < 10; t++){
+            FileWriter fw = new FileWriter(openFrom);
+            for(long i = 0; i < openFrom.length();i++){
+                fw.write(0);
+            }
+            fw.close();
+        }
+        openFrom.delete();
+    }
 }
