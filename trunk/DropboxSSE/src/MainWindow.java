@@ -10,6 +10,7 @@ import com.dropbox.client2.session.RequestTokenPair;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
+import crypto.Crypto;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -27,10 +28,13 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Desktop;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.table.*;
 import javax.swing.JTree;
 
@@ -46,7 +50,9 @@ import javax.swing.JTree;
  */
 
 public class MainWindow extends javax.swing.JFrame {
+    public static SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss ZZZZZ");
     public static String rootPath = new File(".").getAbsolutePath(); //does this always point to Current User's Root Folder? -CQ
+    
     DefaultTableModel dtm = new DefaultTableModel();
     String selectedFile = "";
     public static String userName; //userName is defined in AuthWindow.java
@@ -58,6 +64,9 @@ public class MainWindow extends javax.swing.JFrame {
     
     /** Creates new form MainWindow */
     public MainWindow() {
+        if(rootPath.endsWith("\\.")){
+            rootPath = rootPath.substring(0,rootPath.length()-1);
+        }
         initComponents();
         searchingForModel = new DefaultListModel();
         resultsModel = new DefaultListModel();
@@ -69,9 +78,15 @@ public class MainWindow extends javax.swing.JFrame {
        
 
     }
-    
+    //Map dropbox string path + dateMod
     public static void updateMeta(String filePath, Date mod){
-        meta.put(filePath, mod);
+        if(mod == null){
+            if(meta.containsKey(filePath)){
+                meta.remove(filePath);
+            }
+        }else{
+            meta.put(filePath, mod);
+        }
         try{ //Update meta file
             System.out.println(filePath + " -- " + mod);
             System.out.println("Updating meta file " + userName + File.separator+".meta");
@@ -85,13 +100,45 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     public static Entry pushFile(File f) throws Exception{
-        String dbPath = f.getAbsolutePath().replace(rootPath,"");
-        System.out.println("dbpath: " + dbPath);
-        return DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
+        String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\","/");
+        
+        //String dbPath = getDBPathFromTree();
+        System.out.println("Pusing file " + f.getAbsolutePath() + " to dbpath: " + dbPath);
+        Entry e = DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
+        updateMeta(dbPath,df.parse(e.modified));
+        return e;
     
+    }
+    
+    public static void deleteFile(File f) throws Exception{
+        System.out.println("file path: " + f.getAbsolutePath());
+        System.out.println("rootPath: " + rootPath.replace("\\","\\\\")+userName);
+        String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
+        f.delete();
+        System.out.println("Deleting " + dbPath);
+        DAPI.delete(dbPath);
+        updateMeta(dbPath,null);
+        refreshTree();
+        
     }
 
 
+    public static String getUserPathFromTree(){
+        
+        String treePath = jtree.getSelectionPath().getLastPathComponent().toString();
+        return treePath;
+    }
+    public static String getDBPathFromTree(){
+        String s = getUserPathFromTree();
+        if(new File(s).isDirectory() ){
+            s = s + "\\";
+        }
+        if(s.contains(File.separator)){
+            s = s.substring(s.indexOf(File.separator)).replace(File.separator,"/");
+        }
+       
+        return s;
+    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -147,6 +194,11 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jtree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jtreeValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(jtree);
 
         jLabel1.setText("File Password:");
@@ -297,35 +349,47 @@ public class MainWindow extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+   
     private void btn_RemoveFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveFileActionPerformed
-        System.out.println("delete me is: " + jtree.getSelectionPath().toString());
-
-        String deleteMe = jtree.getSelectionPath().toString();
-        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1); //length-1 gets rid of bracket
-        System.out.println("delete me is now: " + deleteMe);
-
-
-        String userPath = jtree.getSelectionPath().toString();
-        userPath = userPath.substring(1, userPath.indexOf(","));
-        System.out.println("UPATH : " + userPath);
-        File delMe = new File(userPath + "\\" + deleteMe);
-        if (delMe.exists())
-        {
-            delMe.delete();
-        }
-
+//        System.out.println("delete me is: " + jtree.getSelectionPath().toString());
+//        
+//        String deleteMe = jtree.getSelectionPath().toString();
+//        deleteMe = deleteMe.substring(deleteMe.indexOf("\\")+1, deleteMe.length()-1); //length-1 gets rid of bracket
+//        System.out.println("delete me is now: " + deleteMe);
+//
+//
+//        String userPath = jtree.getSelectionPath().toString();
+//        userPath = userPath.substring(1, userPath.indexOf(","));
+//        System.out.println("UPATH : " + userPath);
+//        File delMe = new File(userPath + "\\" + deleteMe);
         try{
-            jtree.setVisible(false);
-            jtree.setSelectionPath(null);
-            DAPI.delete(deleteMe);
-            AuthWindow.obtainFiles(new File(userPath));
-            FileTreeModel model = new FileTreeModel(new File(userPath));
-            jtree.setModel(model);
-            jtree.setVisible(true);
-        }catch(Exception e){e.printStackTrace();}
+            deleteFile(new File(getUserPathFromTree()));
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("Error deleting file... Does it exist?");
+        }
+//        if (delMe.exists())
+//        {
+//            delMe.delete();
+//        }
+//
+//        try{
+//            jtree.setVisible(false);
+//            jtree.setSelectionPath(null);
+//            
+//            AuthWindow.obtainFiles(new File(userPath));
+//            FileTreeModel model = new FileTreeModel(new File(userPath));
+//            jtree.setModel(model);
+//            jtree.setVisible(true);
+//        }catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_RemoveFileActionPerformed
-
+    public static void refreshTree(){
+        jtree.setVisible(false);
+        AuthWindow.obtainFiles(new File(userName));
+        FileTreeModel model = new FileTreeModel(new File(userName));
+        jtree.setModel(model);
+        jtree.setVisible(true); 
+    }
     private void btn_EditFileKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_EditFileKeywordsActionPerformed
         // TODO add your handling code here:
         if (jtree.getSelectionPath() == null)
@@ -351,6 +415,7 @@ public class MainWindow extends javax.swing.JFrame {
             {
                 System.out.println("No password given");
                 //show jmessagebox?
+                JOptionPane.showMessageDialog(null,"No password given");
             }
             else
             {
@@ -409,41 +474,74 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_SearchActionPerformed
 
     private void btn_AddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddFileActionPerformed
-        String dropboxAddPath = jtree.getSelectionPath().toString();
-        boolean folderSelected = false;
-        boolean rootSelected = false;
-
-        if(!dropboxAddPath.contains(userName+"\\"))
-        {
-            dropboxAddPath = dropboxAddPath.substring(1);
-            rootSelected = true;
+        if(passwordField.getPassword().length==0){
+            JOptionPane.showMessageDialog(this,"Enter a password for the file");
+            return;
         }
-        else
-        {
-            int cutoff = userName.length();
-            dropboxAddPath = dropboxAddPath.substring(dropboxAddPath.indexOf(userName+"\\")+cutoff);
+        //        String dropboxAddPath = jtree.getSelectionPath().toString();
+//        boolean folderSelected = false;
+//        boolean rootSelected = false;
+//
+//        if(!dropboxAddPath.contains(userName+"\\"))
+//        {
+//            dropboxAddPath = dropboxAddPath.substring(1);
+//            rootSelected = true;
+//        }
+//        else
+//        {
+//            int cutoff = userName.length();
+//            dropboxAddPath = dropboxAddPath.substring(dropboxAddPath.indexOf(userName+"\\")+cutoff);
+//        }
+//        dropboxAddPath = dropboxAddPath.substring(0, dropboxAddPath.length()-1);
+//        
+//        String selectedFileLocation = "";
+//        if(rootSelected == false)
+//        {
+//            selectedFileLocation = AuthWindow.currentUserPath + dropboxAddPath;
+//        }
+//        else
+//        {
+//            selectedFileLocation = AuthWindow.currentUserPath;
+//        }
+        if(jtree.isSelectionEmpty()){//If nothing is selected, select root
+            jtree.setSelectionInterval(0,0);
         }
-        dropboxAddPath = dropboxAddPath.substring(0, dropboxAddPath.length()-1);
+        if(!new File(getUserPathFromTree()).isDirectory()){//If file is selected, select file parent
+            jtree.setSelectionPath(jtree.getSelectionPath().getParentPath());
+        }
         
-        String selectedFileLocation = "";
-        if(rootSelected == false)
-        {
-            selectedFileLocation = AuthWindow.currentUserPath + dropboxAddPath;
-        }
-        else
-        {
-            selectedFileLocation = AuthWindow.currentUserPath;
-        }
-        System.out.println("file's local location = " + selectedFileLocation);
-        System.out.println("dropboxAddPath = "+ dropboxAddPath);
-        File isFolder = new File(selectedFileLocation);
-        if (isFolder.isDirectory()== true)
-        {
-            System.out.println("user has selected a folder");
-            folderSelected = true;
-        }
+        String userLocation = getUserPathFromTree();
+        String DBLocation = getDBPathFromTree();
+        System.out.println("file's local location = " + userLocation);
+        System.out.println("dropboxAddPath = "+ DBLocation);
 
-/*
+        
+        JFileChooser jfc = new JFileChooser("");
+        jfc.showOpenDialog(this);
+        File f = jfc.getSelectedFile();
+        
+        if(f == null){
+            System.err.println("Did not choose a file");
+            return;
+        }
+        System.out.println(f.getAbsolutePath());
+        
+        try{
+            //Create encrypted version of file in user SecDB directory
+            File destination = new File(userLocation + File.separator+f.getName());
+            Crypto.fileAESenc(f,destination, passwordField.getPassword(),false);
+            String searchKey = JOptionPane.showInputDialog(this,"Enter the SSE Search password:","Search Password",0);
+            Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
+            //Push encrypted file to dropbox
+            pushFile(destination);
+            File searchFile = new File(userLocation + File.separator + f.getName() + Crypto.EXT);
+            pushFile(searchFile);
+            refreshTree();
+            
+        }catch(Exception e){System.err.println("Error encrypting and pushing file"); e.printStackTrace();}
+        
+        
+/*      
         System.out.println("Note to self: force user to select a directory?");
         System.out.println("Note to self: figure out if we need the \\ or not");
  * */
@@ -461,6 +559,14 @@ public class MainWindow extends javax.swing.JFrame {
             System.out.println("Please select keyword to delete");
         }
     }//GEN-LAST:event_btn_RemoveSearchKeyActionPerformed
+
+    private void jtreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jtreeValueChanged
+        // TODO add your handling code here:
+        if(jtree != null && jtree.getSelectionPath()!= null){
+            System.out.println("User Path: " + getUserPathFromTree());
+            System.out.println("DB Path: " + getDBPathFromTree());
+        }
+    }//GEN-LAST:event_jtreeValueChanged
 
     /**
     * @param args the command line arguments

@@ -11,6 +11,7 @@ import com.dropbox.client2.session.RequestTokenPair;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
+import crypto.Crypto;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -400,7 +401,7 @@ class FileTreeModel implements TreeModel {
     FilenameFilter ff = new FilenameFilter() {
 
         public boolean accept(File file, String string) {
-            return !string.startsWith(".");
+            return !string.startsWith(".") && ! string.endsWith(Crypto.EXT);
         }
     };
   // We specify the root directory when we create the model.

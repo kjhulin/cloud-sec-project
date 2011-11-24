@@ -241,7 +241,7 @@ public class EditWindow extends javax.swing.JFrame {
         try
         {
             File saveAs = new File(txtField_Browse.getText().toString());
-            crypto.Crypto.fileAESenc(currentFile, saveAs, searchPasswordField.getPassword(), true);
+            crypto.Crypto.fileAESdec(currentFile, saveAs, searchPasswordField.getPassword());
         }catch(Exception e){e.printStackTrace();}
             
     }//GEN-LAST:event_btn_DecryptActionPerformed
@@ -286,7 +286,7 @@ public class EditWindow extends javax.swing.JFrame {
         try
         {
             //delete original file from dropbox
-            MainWindow.DAPI.delete(currentFile);
+            MainWindow.deleteFile(currentFile);
 
             //push new file  to dropbox
             File uploadFile = new File(txtField_Browse.getText());
@@ -296,7 +296,7 @@ public class EditWindow extends javax.swing.JFrame {
 
             //push new file with new keywords to dropbox
             MainWindow.pushFile(currentFile);    
-            MainWindow.pushFile(currentFile);
+           // MainWindow.pushFile(currentFile);
         }catch (Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_ReplaceFileActionPerformed
 
