@@ -1,4 +1,5 @@
 package crypto;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,10 +33,11 @@ public class SSE2
 	private final static String HMAC_MODE = "HmacSHA256";
 	private final static int AES_KEY_SIZE = 128;
 	private final static String AES_CIPHER_MODE = "AES/CBC/PKCS5Padding";
-	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
+        public final static String keywordRegex = "[A-Za-z]+";
+	public final static String regex = "^("+keywordRegex+")?(,"+keywordRegex+")*$";
 	private final static String DB_FILE = "SSE2.DB";
 	private final static String DB_EXT = ".EXT";
-	
+        
 	/**
 	 * SSE2 createDatabase method
 	 * Performs HMAC verification. If successful, append structure to file.
@@ -44,9 +46,13 @@ public class SSE2
 	 * @return Boolean result that indicates if creation of structure file was successful
 	 * @throws AlertException Thrown for HMAC verification failures, IOException exceptions
 	 */
-	public static final boolean createDatabase(final char[] pass) throws AlertException
+        public static boolean isValidKeyword(String s){
+            return Pattern.matches(keywordRegex, s);
+        }
+	public static final boolean createDatabase(final char[] pass,String path) throws AlertException
 	{
-		File db = new File(DB_FILE);
+                
+		File db = new File(path + File.separator + DB_FILE);
 		File ext = new File(db.getAbsolutePath() + DB_EXT);
 		
 		if(ext.exists())
@@ -94,10 +100,10 @@ public class SSE2
 	 * @return Boolean result that indicates if database and structure files were deleted successfully
 	 * @throws AlertException Thrown for HMAC verification failure, IOExceptions
 	 */
-	public static final boolean deleteDatabase(final char[] pass) throws AlertException
+	public static final boolean deleteDatabase(final char[] pass,String path) throws AlertException
 	{
 		File db = new File(DB_FILE);
-		
+		if(!db.exists())
 		if(!verifyHMAC(pass.clone()))
 			throw new AlertException("deleteDatabase: hmac verification failed");
 		Arrays.fill(pass, (char) 0);
@@ -246,13 +252,13 @@ public class SSE2
 	 */
 	public static void buildIndex(File dir, final char[] pass) throws AlertException
 	{	
-		if(!deleteDatabase(pass.clone()))
+		if(!deleteDatabase(pass.clone(),dir.getAbsolutePath()))
 			throw new AlertException("buildIndex: unable to delete database");
 		
 		if(!SQL.createDatabase())
 			throw new AlertException("buildIndex: unable to create database");
 		
-		if(!createDatabase(pass.clone()))
+		if(!createDatabase(pass.clone(),dir.getAbsolutePath()))
 			throw new AlertException("buildIndex: unable to create structure");
 		
 		Traverse folder = new Traverse(dir);
@@ -568,7 +574,7 @@ public class SSE2
 		String pw = "This is an extremely long generic key 0123456789 !@#$%^&*(){}|:\"<>?,./;'[]\'";
 		char [] pass = pw.toCharArray();
 		
-		createDatabase(pass.clone());
+		createDatabase(pass.clone(),"");
 		
 		boolean verify = verifyHMAC(pass.clone());
 		System.out.println("verify: " + verify);
@@ -592,8 +598,8 @@ public class SSE2
 		words = parseKeys(str);
 		for(String w : words)
 			System.out.println("word: " + w + " " + w.length());
-		
-		buildIndex(new File("TEST"), pass.clone());
+		File test = new File("TEST");
+		buildIndex(test, pass.clone());
 		
 		words = trapdoor("hello", pass.clone());
 		for(String w : words)

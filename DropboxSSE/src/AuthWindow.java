@@ -197,7 +197,7 @@ public class AuthWindow extends javax.swing.JFrame {
 
         try{
 
-        System.out.println("Confirm button hit");
+        //System.out.println("Confirm button hit");
         System.out.println("Successfully authenticated for userid:" + authWAS.retrieveWebAccessToken(rtp));
         ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(tokensFile)));
         AccessTokenPair atp = authWAS.getAccessTokenPair();
@@ -216,7 +216,7 @@ public class AuthWindow extends javax.swing.JFrame {
                         BufferedInputStream(new FileInputStream(tkc.username.toString()+File.separator+".meta")));
                 MainWindow.meta =  (HashMap<String,Date>)ois.readObject();
                 ois.close();
-                System.out.println(MainWindow.meta);
+                //System.out.println(MainWindow.meta);
             }else{
                 MainWindow.meta = new HashMap<String,Date>();
             }
@@ -251,8 +251,8 @@ public class AuthWindow extends javax.swing.JFrame {
     
     public static SimpleDateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy kk:mm:ss ZZZZZ");
     public static void getFolderContents(String s, File uPath){
-        System.out.println("UPATH: "+ uPath);
-        System.out.println("s: "+s);
+        //System.out.println("UPATH: "+ uPath);
+        //System.out.println("s: "+s);
         try{
 
             //upath == user path
@@ -260,26 +260,26 @@ public class AuthWindow extends javax.swing.JFrame {
             for(Entry e : listDirectory(s)){
 
                 if(e.isDir){
-                    System.out.println("e.fileName() == " + e.fileName());
-                    System.out.println("eParentPath: "+e.parentPath());
+                    //System.out.println("e.fileName() == " + e.fileName());
+                    //System.out.println("eParentPath: "+e.parentPath());
                     File path = new File(uPath.toString() + File.separator + e.fileName());
-                    System.out.println("PATH: "+path.getAbsolutePath().toString());
+                    //System.out.println("PATH: "+path.getAbsolutePath().toString());
                     if(!path.exists()){
                         path.mkdir();
                     }
                     getFolderContents(e.parentPath() + e.fileName(), path);
                 }else{
-                    System.out.println("e.fileName() == " + e.fileName());
-                    System.out.println("PARENT PATH: " + e.parentPath());
+                   // System.out.println("e.fileName() == " + e.fileName());
+                    //System.out.println("PARENT PATH: " + e.parentPath());
 
                     File downloadPath = new File(uPath.toString() + File.separator + e.fileName());
                     Date dateModified = df.parse(e.modified);
-                    System.out.println("date modified: " + dateModified.toString());
-                    System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
+                    //System.out.println("date modified: " + dateModified.toString());
+                    //System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
                     String dbPath = e.parentPath()+e.fileName();
-                    if(!MainWindow.meta.containsKey(dbPath) ||
-                            !new File(downloadPath.toString()).exists() ||
-                        dateModified.after(MainWindow.meta.get(dbPath))){
+                    if(!MainWindow.meta.containsKey(dbPath) 
+                            || !new File(downloadPath.toString()).exists() 
+                            || dateModified.after(MainWindow.meta.get(dbPath))){
                         System.out.println("Downloading new version of " + dbPath);
                         DropboxFileInfo dis =
                             MainWindow.DAPI.getFile(dbPath, null, new FileOutputStream(downloadPath.toString()), null);
@@ -291,7 +291,7 @@ public class AuthWindow extends javax.swing.JFrame {
     }
 
     public static  List<Entry> listDirectory(String path) throws Exception{
-        System.out.println("list path:" + path);
+       //System.out.println("list path:" + path);
        Entry entry = MainWindow.DAPI.metadata(path, 0, null, true, null);
        if (!entry.isDir) return null;
                return entry.contents;
@@ -310,7 +310,7 @@ public class AuthWindow extends javax.swing.JFrame {
         
         //AccessTokenPair atp = authWAS.getAccessTokenPair();
         MainWindow.userName = lbl_currentUser.getText();
-        System.out.println("lbl_current_user == " + lbl_currentUser.getText());
+        //System.out.println("lbl_current_user == " + lbl_currentUser.getText());
         File userFolder = new File(lbl_currentUser.getText());
         if(userFolder.exists())
         {

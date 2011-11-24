@@ -11,6 +11,7 @@ import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
 import crypto.Crypto;
+import crypto.SSE2;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -394,36 +395,50 @@ public class MainWindow extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (jtree.getSelectionPath() == null)
         {
-            System.out.println("Select a file first");
+            JOptionPane.showMessageDialog(this,"Select a file to edit!");
+            return;
+            //System.out.println("Select a file first");
         }
         else
         {
-            String selectedFile = jtree.getSelectionPath().toString();
-            int lastComma = 0;
-            while(selectedFile.indexOf(",") != -1)
-            {
-                lastComma = selectedFile.indexOf(",") + 1;
-                selectedFile = selectedFile.substring(lastComma);
-            }
-            selectedFile = selectedFile.substring(selectedFile.indexOf("\\"), selectedFile.length()-1);
-            String selectedFileLocation = AuthWindow.currentUserPath + selectedFile;
-            //System.out.println("File Location: " + selectedFileLocation);
 
+            String selectedFileLocation = getUserPathFromTree();
             File editFile = new File(selectedFileLocation);
-
+            if(editFile.isDirectory()){
+                JOptionPane.showMessageDialog(this,"Directory selected.  Please select a file.");
+                return;
+            }
             if (passwordField.getPassword().length == 0)
             {
-                System.out.println("No password given");
-                //show jmessagebox?
+
                 JOptionPane.showMessageDialog(null,"No password given");
+                return;
             }
             else
             {
-                //send File and Given Password to crypto
+                //send File and Given Search Password to crypto
                 try
                 {
+                    File SSEfile = new File(editFile.getAbsolutePath()+Crypto.EXT);
+                    
+                    if(!SSEfile.exists()){
+                        
+                        //String searchKey = JOptionPane.showInputDialog(this,"SSE File not found! Enter the SSE Search password to create it:","Search Password",0);
+                        //TODO: Verify searchKey against Database?
+                        JOptionPane.showMessageDialog(this,"SSE File not found! Generating search file from provided password\nTODO:Verifying Search Key (against DB?) here");
+                        Crypto.keyAESenc(editFile, passwordField.getPassword(), new StringBuilder(""));
+                        //Push encrypted file to dropbox
+                        pushFile(SSEfile);
+                    }
+                    
+                    if(!Crypto.verifyHMAC(SSEfile, passwordField.getPassword())){
+                        JOptionPane.showMessageDialog(this,"Invalid search password");
+                        return;
+                    }
+                    //Create SSEFile if it dosent exist
+
                     //crypto.Crypto.keyAESdec(editFile, passwordField.getPassword());
-                    EditWindow ew = new EditWindow(editFile);
+                    EditWindow ew = new EditWindow(editFile,passwordField.getPassword());
                     ew.setVisible(true);
                     ew.setTitle(editFile.getAbsolutePath());
 
@@ -432,8 +447,12 @@ public class MainWindow extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btn_EditFileKeywordsActionPerformed
-
+    
     private void btn_AddKeyToSearchForActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddKeyToSearchForActionPerformed
+        if(!SSE2.isValidKeyword(txtField_SearchForKey.getText())){
+            JOptionPane.showMessageDialog(this,"Invalid keyword:  Must follow the pattern: " + SSE2.keywordRegex);
+            return;
+        }
         String keyToAdd = txtField_SearchForKey.getText();
         txtField_SearchForKey.setText("");
         searchingForModel.addElement(keyToAdd);
@@ -443,14 +462,16 @@ public class MainWindow extends javax.swing.JFrame {
         char[] searchKey = searchPasswordField.getPassword();
         if (searchKey.length == 0) //is null
         {
-            System.out.println("No search key entered");
+            JOptionPane.showMessageDialog(this, "No password entered!");
         }
+        //TODO: Verify hmac here!  (Maybe make a new file just to hold the hash of the password)
         else
         {
             try
             {
-                crypto.SSE2.createDatabase(searchKey);
-                File userRootPath = new File(rootPath);
+                String userPath = rootPath+ File.separator + userName;
+                crypto.SSE2.createDatabase(searchKey,userPath);
+                File userRootPath = new File(userPath);
                 crypto.SSE2.buildIndex(userRootPath, searchKey);
                 Vector<String> results = new Vector<String>();
 
@@ -467,7 +488,7 @@ public class MainWindow extends javax.swing.JFrame {
                     resultsModel.addElement(i);
                 }
 
-                crypto.SSE2.deleteDatabase(searchKey);
+                crypto.SSE2.deleteDatabase(searchKey,userPath);
             }
             catch(Exception e){e.printStackTrace();}
         }
@@ -529,12 +550,13 @@ public class MainWindow extends javax.swing.JFrame {
         try{
             //Create encrypted version of file in user SecDB directory
             File destination = new File(userLocation + File.separator+f.getName());
-            Crypto.fileAESenc(f,destination, passwordField.getPassword(),false);
+            Crypto.fileAESenc(f,destination, passwordField.getPassword().clone(),false);
             String searchKey = JOptionPane.showInputDialog(this,"Enter the SSE Search password:","Search Password",0);
             Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
             //Push encrypted file to dropbox
             pushFile(destination);
             File searchFile = new File(userLocation + File.separator + f.getName() + Crypto.EXT);
+            System.out.println(searchFile.getAbsolutePath());
             pushFile(searchFile);
             refreshTree();
             

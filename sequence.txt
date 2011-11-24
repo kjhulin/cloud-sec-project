@@ -72,3 +72,6 @@ output of above:
 
 DELETE ME: [Crypto Project, Crypto Project\oSnmZajg]
 oSnmZajg
+
+
+Idea: Pad searchword file so that you can't tell how many terms are associated with a file simply by looking at it's side (would have to pad pretty substantially or alternatively, pad to longest file length)
