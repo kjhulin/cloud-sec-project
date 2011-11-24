@@ -41,7 +41,7 @@ public class Crypto
 	private final static String HMAC_MODE = "HmacSHA256";
 	private final static int AES_KEY_SIZE = 128;
 	private final static String AES_CIPHER_MODE = "AES/CTR/NoPadding";
-	private final static String EXT = ".SSE2";
+	public final static String EXT = ".SSE2";
 	private final static String TEMP = ".TEMP";
 	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
 	
@@ -398,6 +398,7 @@ public class Crypto
 				writer.write(str.charAt(i));
 			writer.flush();
 			writer.close();
+                        
 		}
 		catch(Exception e)
 		{throw new AlertException("keyAESenc: unable to create temp file");}
