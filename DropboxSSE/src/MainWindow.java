@@ -470,6 +470,7 @@ public class MainWindow extends javax.swing.JFrame {
             try
             {
                 String userPath = rootPath+ File.separator + userName;
+                
                 crypto.SSE2.createDatabase(searchKey,userPath);
                 File userRootPath = new File(userPath);
                 crypto.SSE2.buildIndex(userRootPath, searchKey);
