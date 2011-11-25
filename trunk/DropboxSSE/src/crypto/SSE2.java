@@ -35,7 +35,7 @@ public class SSE2
 	private final static String AES_CIPHER_MODE = "AES/CBC/PKCS5Padding";
         public final static String keywordRegex = "[A-Za-z]+";
 	public final static String regex = "^("+keywordRegex+")?(,"+keywordRegex+")*$";
-	private final static String DB_FILE = "SSE2.DB";
+	private static String DB_FILE = "SSE2.DB";
 	private final static String DB_EXT = ".EXT";
 
 	/**
@@ -46,10 +46,13 @@ public class SSE2
 	 * @return Boolean result that indicates if creation of structure file was successful
 	 * @throws AlertException Thrown for HMAC verification failures, IOException exceptions
 	 */
+        public static void setDB_Path(String s){
+            DB_FILE = s + File.separator + "SSE2.DB";
+        }
         public static boolean isValidKeyword(String s){
             return Pattern.matches(keywordRegex, s);
         }
-	public static final boolean createDatabase(final char[] pass,String path) throws AlertException
+	public static final boolean createDatabase(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
 		File ext = new File(db.getAbsolutePath() + DB_EXT);
@@ -260,7 +263,7 @@ public class SSE2
 		if(!SQL.createDatabase())
 			throw new AlertException("buildIndex: unable to create database");
 
-		if(!createDatabase(pass.clone(),dir.getAbsolutePath()))
+		if(!createDatabase(pass.clone()))
 			throw new AlertException("buildIndex: unable to create structure");
 
 		Traverse folder = new Traverse(dir);
@@ -576,7 +579,7 @@ public class SSE2
 		String pw = "This is an extremely long generic key 0123456789 !@#$%^&*(){}|:\"<>?,./;'[]\'";
 		char [] pass = pw.toCharArray();
 
-		createDatabase(pass.clone(),"");
+		createDatabase(pass.clone());
 
 		boolean verify = verifyHMAC(pass.clone());
 		System.out.println("verify: " + verify);
