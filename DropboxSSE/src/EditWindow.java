@@ -397,7 +397,7 @@ public class EditWindow extends javax.swing.JFrame {
                 return;
             }
             //delete original file from dropbox
-            MainWindow.deleteFile(currentFile);
+            MainWindow.deleteFile(currentFile,false);
             
             //push new file  to dropbox
             

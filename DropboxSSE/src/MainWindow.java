@@ -29,6 +29,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.Desktop;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -105,21 +106,69 @@ public class MainWindow extends javax.swing.JFrame {
 
         //String dbPath = getDBPathFromTree();
         System.out.println("Pusing file " + f.getAbsolutePath() + " to dbpath: " + dbPath);
-        Entry e = DAPI.putFileOverwrite(dbPath,new FileInputStream(f),f.length(),null);
-        updateMeta(dbPath,df.parse(e.modified));
-        return e;
+        if(f.isDirectory()){
+            return DAPI.createFolder(dbPath);
+        }else{
+            FileInputStream fis = new FileInputStream(f);
+            Entry e = DAPI.putFileOverwrite(dbPath,fis,f.length(),null);
+            fis.close();
+            updateMeta(dbPath,df.parse(e.modified));
+            return e;
+        }
 
     }
 
-    public static void deleteFile(File f) throws Exception{
+    public static FilenameFilter ffilter = new FilenameFilter() {
+                public boolean accept(File file, String string) {
+                    System.out.println(string);
+                    return !string.endsWith(Crypto.EXT);
+                }
+            };
+    public static void deleteFile(File f, boolean force) throws Exception{
+        
         System.out.println("file path: " + f.getAbsolutePath());
         System.out.println("rootPath: " + rootPath.replace("\\","\\\\")+userName);
-        String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
-        f.delete();
-        System.out.println("Deleting " + dbPath);
-        DAPI.delete(dbPath);
-        updateMeta(dbPath,null);
-        refreshTree();
+        if(f.isDirectory()){
+            if(!force){
+                Object[] options = { "OK", "CANCEL" };
+                int t = JOptionPane.showOptionDialog(null, "Warning! " + f.getName() 
+                                + " is a directory.  Delete directory and all contents?", "Warning",
+                                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                                null, options, options[1]);
+                if( t!= 0)
+                    return;
+            }
+            
+            for(File ff : f.listFiles(ffilter)){
+                System.out.println("folder contents: " + ff.getName());
+                deleteFile(ff,true);    
+            }
+            System.out.println("Deleting file: " + f.getName());
+            f.delete();
+            if(f.exists()){
+                refreshTree();
+                JOptionPane.showMessageDialog(null,"Could not delete all of directory contents.  Are some files open by other programs?");
+            }
+            String fname = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
+            try{
+                DAPI.delete(fname);
+            }catch(Exception e){System.out.println("Could not delete DB: " + fname);}
+            refreshTree();
+            
+        }else{
+            String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
+            Crypto.secureDelete(f);
+            Crypto.secureDelete(new File(f.getAbsolutePath() + Crypto.EXT));
+            System.out.println("Deleting " + dbPath);
+            try{
+                DAPI.delete(dbPath);   
+            }catch(Exception e){System.out.println("Could not delete from DB: " + dbPath);}
+            try{
+                DAPI.delete(dbPath + Crypto.EXT);
+            }catch(Exception e){System.out.println("Could not delete EXT from DB" + dbPath + Crypto.EXT);}
+            updateMeta(dbPath,null);
+            refreshTree();
+        }
 
     }
 
@@ -171,6 +220,7 @@ public class MainWindow extends javax.swing.JFrame {
         list_Results = new javax.swing.JList();
         jSeparator2 = new javax.swing.JSeparator();
         btn_RemoveSearchKey = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -202,7 +252,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jtree);
 
-        jLabel1.setText("File Password:");
+        jLabel1.setText("Password:");
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -249,6 +299,13 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Add Subdirectory In Currently Selected Directory");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -256,58 +313,62 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_EditFileKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(btn_AddFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-                    .addComponent(btn_RemoveFile, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                            .addComponent(btn_AddFile, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                            .addComponent(btn_EditFileKeywords, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(searchPasswordField))
-                                    .addComponent(btn_AddKeyToSearchFor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtField_SearchForKey))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(26, 26, 26)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(btn_Search, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(btn_RemoveSearchKey, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(searchPasswordField))
+                                            .addComponent(btn_AddKeyToSearchFor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel3)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtField_SearchForKey))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(26, 26, 26)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                    .addComponent(btn_Search, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .addComponent(btn_RemoveSearchKey, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addGap(46, 46, 46)
+                                                .addComponent(jLabel4))))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGap(46, 46, 46)
-                                        .addComponent(jLabel4))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(196, 196, 196)
-                                .addComponent(jLabel5))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE))))
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addGap(196, 196, 196)
+                                        .addComponent(jLabel5))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE))))
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btn_RemoveFile, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
+                        .addGap(450, 450, 450))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(25, 25, 25)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -335,17 +396,22 @@ public class MainWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(31, 31, 31)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(15, 15, 15)
-                .addComponent(btn_AddFile)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_AddFile)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_EditFileKeywords)
-                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btn_EditFileKeywords)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btn_RemoveFile)
-                .addContainerGap())
+                .addGap(66, 66, 66))
         );
 
         pack();
@@ -364,7 +430,7 @@ public class MainWindow extends javax.swing.JFrame {
 //        System.out.println("UPATH : " + userPath);
 //        File delMe = new File(userPath + "\\" + deleteMe);
         try{
-            deleteFile(new File(getUserPathFromTree()));
+            deleteFile(new File(getUserPathFromTree()),false);
         }catch(Exception e){
             e.printStackTrace();
             System.err.println("Error deleting file... Does it exist?");
@@ -386,7 +452,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_RemoveFileActionPerformed
     public static void refreshTree(){
         jtree.setVisible(false);
-        AuthWindow.obtainFiles(new File(userName));
+        //AuthWindow.obtainFiles(new File(userName));
         FileTreeModel model = new FileTreeModel(new File(userName));
         jtree.setModel(model);
         jtree.setVisible(true);
@@ -461,35 +527,38 @@ public class MainWindow extends javax.swing.JFrame {
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
         char[] searchKey = searchPasswordField.getPassword();
         SSE2.setDB_Path(rootPath + userName );
+        
         if (searchKey.length == 0) //is null
         {
             JOptionPane.showMessageDialog(this, "No password entered!");
         }
+        
         //TODO: Verify hmac here!  (Maybe make a new file just to hold the hash of the password)
         else
         {
+            resultsModel.clear();
             try
             {
                 //String userPath = rootPath+ File.separator + userName;
                 String userPath = rootPath + userName + File.separator;
                 System.out.println("USER PATH: " + userPath);
 
-                crypto.SSE2.createDatabase(searchKey,userPath);
+                crypto.SSE2.createDatabase(searchKey.clone());
                 File userRootPath = new File(userPath);
-                crypto.SSE2.buildIndex(userRootPath, searchKey);
+                crypto.SSE2.buildIndex(userRootPath, searchKey.clone());
                 Vector<String> results = new Vector<String>();
 
                 for(int i = 0; i < searchingForModel.getSize(); i++)
                 {
                     Vector<String> traps =
-                            crypto.SSE2.trapdoor(searchingForModel.getElementAt(i).toString(), searchKey);
+                            crypto.SSE2.trapdoor(searchingForModel.getElementAt(i).toString(), searchKey.clone());
 
-                    results = crypto.SSE2.search(traps, searchKey);
+                    results = crypto.SSE2.search(traps, searchKey.clone());
                 }
                 //Return results here
                 for (int i = 0; i < results.size(); i++)
                 {
-                    resultsModel.addElement(i);
+                    resultsModel.addElement(results.get(i));
                 }
 
                 crypto.SSE2.deleteDatabase(searchKey,userPath);
@@ -503,31 +572,6 @@ public class MainWindow extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,"Enter a password for the file");
             return;
         }
-        //        String dropboxAddPath = jtree.getSelectionPath().toString();
-//        boolean folderSelected = false;
-//        boolean rootSelected = false;
-//
-//        if(!dropboxAddPath.contains(userName+"\\"))
-//        {
-//            dropboxAddPath = dropboxAddPath.substring(1);
-//            rootSelected = true;
-//        }
-//        else
-//        {
-//            int cutoff = userName.length();
-//            dropboxAddPath = dropboxAddPath.substring(dropboxAddPath.indexOf(userName+"\\")+cutoff);
-//        }
-//        dropboxAddPath = dropboxAddPath.substring(0, dropboxAddPath.length()-1);
-//
-//        String selectedFileLocation = "";
-//        if(rootSelected == false)
-//        {
-//            selectedFileLocation = AuthWindow.currentUserPath + dropboxAddPath;
-//        }
-//        else
-//        {
-//            selectedFileLocation = AuthWindow.currentUserPath;
-//        }
         if(jtree.isSelectionEmpty()){//If nothing is selected, select root
             jtree.setSelectionInterval(0,0);
         }
@@ -593,6 +637,36 @@ public class MainWindow extends javax.swing.JFrame {
             System.out.println("DB Path: " + getDBPathFromTree());
         }
     }//GEN-LAST:event_jtreeValueChanged
+    /**
+     * MKDIR Button
+     */
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        if(jtree.isSelectionEmpty()){//If nothing is selected, select root
+            jtree.setSelectionInterval(0,0);
+        }
+        if(!new File(getUserPathFromTree()).isDirectory()){//If file is selected, select file parent
+            jtree.setSelectionPath(jtree.getSelectionPath().getParentPath());
+        }
+        String dirName = JOptionPane.showInputDialog(this,"Name of new directory?");
+        if(dirName == null){
+            return;
+        }
+        String userLocation = getUserPathFromTree();
+        String DBLocation = getDBPathFromTree();
+        try{
+            File dir = new File(userLocation + File.separator + dirName);
+            if(dir.exists()) throw new Exception();
+            dir.mkdir();
+            if(!dir.isDirectory()) throw new Exception();
+            pushFile(dir);
+            refreshTree();
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error creating directory. Be sure that the directory name is not already being used and that it contains only valid characters.");
+            return;
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
     * @param args the command line arguments
@@ -624,6 +698,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton btn_RemoveFile;
     private javax.swing.JButton btn_RemoveSearchKey;
     private javax.swing.JButton btn_Search;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

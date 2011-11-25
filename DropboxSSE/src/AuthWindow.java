@@ -401,7 +401,8 @@ class FileTreeModel implements TreeModel {
     FilenameFilter ff = new FilenameFilter() {
 
         public boolean accept(File file, String string) {
-            return !string.startsWith(".") && ! string.endsWith(Crypto.EXT);
+            return !string.startsWith(".") && ! string.endsWith(Crypto.EXT) 
+                    && !string.equals("SSE2.DB") && !string.equals("SSE2.DB.EXT");
         }
     };
   // We specify the root directory when we create the model.

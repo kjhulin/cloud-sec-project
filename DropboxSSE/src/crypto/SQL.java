@@ -13,7 +13,7 @@ import java.util.Vector;
 public class SQL
 {
 	private static final String SQL_CLASS = "org.sqlite.JDBC";
-	private static final String SQL_FILE = "jdbc:sqlite:SSE2.DB";
+	public static String SQL_FILE = "jdbc:sqlite:SSE2.DB";
 	
 	private static final String CREATE_DOCUMENT_TABLE = "create table if not exists document(id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT UNIQUE)";
 	private static final String DROP_DOCUMENT_TABLE = "drop table if exists document";
