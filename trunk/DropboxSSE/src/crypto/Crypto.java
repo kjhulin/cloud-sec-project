@@ -143,6 +143,7 @@ public class Crypto
 	 */
 	public static void fileAESdec(File src, File dest, final char[] pass) throws AlertException
 	{
+            System.out.println(Arrays.toString(pass));
 		if(!verifyHMAC(src, pass.clone()))
 			throw new AlertException("fileAESdec: hmac verification failed");
 		
@@ -651,5 +652,6 @@ public class Crypto
             fw.close();
         }
         openFrom.delete();
+        
     }
 }

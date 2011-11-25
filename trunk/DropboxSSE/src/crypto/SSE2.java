@@ -48,6 +48,7 @@ public class SSE2
 	 */
         public static void setDB_Path(String s){
             DB_FILE = s + File.separator + "SSE2.DB";
+            SQL.SQL_FILE = "jdbc:sqlite:" + DB_FILE;
         }
         public static boolean isValidKeyword(String s){
             return Pattern.matches(keywordRegex, s);
@@ -132,7 +133,7 @@ public class SSE2
 	private static void appendHMAC(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
-
+                System.out.println(DB_FILE);
 		final byte[] salt = Crypto.generateBytes(SALT_SIZE);
 
 		byte[] secret = Crypto.keygen(pass, salt, HMAC_KEY_SIZE);
@@ -156,7 +157,7 @@ public class SSE2
 			is.close();
 		}
 		catch(Exception e)
-		{throw new AlertException("appendHMAC: unable to calculate hmac");}
+		{e.printStackTrace();throw new AlertException("appendHMAC: unable to calculate hmac");}
 
 		RandomAccessFile file;
 		FileChannel channel;
@@ -188,10 +189,11 @@ public class SSE2
 	public static final boolean verifyHMAC(final char[] pass) throws AlertException
 	{
 		File db = new File(DB_FILE);
-
+                System.out.println(DB_FILE);
+                System.out.println(Arrays.toString(pass));
 		final byte[] salt = new byte[SALT_SIZE];
 		final byte[] hmac = new byte[HMAC_SIZE];
-		int len = 0;
+		long len = 0;
 		RandomAccessFile file;
 		FileChannel channel;
 		ByteBuffer buf;
@@ -199,7 +201,8 @@ public class SSE2
 		{
 			file = new RandomAccessFile(new File(db.getAbsolutePath() + DB_EXT), "r");
 			channel = file.getChannel();
-			len = (int) channel.size();
+			len = channel.size();
+                        System.out.println((len - (SALT_SIZE + HMAC_SIZE)));
 			channel.position((long)(len - (SALT_SIZE + HMAC_SIZE)));
 			buf = ByteBuffer.wrap(salt);
 			channel.read(buf);
@@ -209,7 +212,7 @@ public class SSE2
 			file.close();
 		}
 		catch(Exception e)
-		{throw new AlertException("verifyHMAC: unable to parse structure");}
+		{e.printStackTrace();throw new AlertException("verifyHMAC: unable to parse structure");}
 
 		final byte[] secret = Crypto.keygen(pass, salt, HMAC_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
@@ -285,7 +288,14 @@ public class SSE2
 			{throw new AlertException("buildIndex: unable to get document path");}
 
 			src = new File(path);
-			StringBuilder sb = Crypto.keyAESdec(src, pass.clone());
+                        StringBuilder sb = null;
+                        try{
+                             sb = Crypto.keyAESdec(src, pass.clone());
+                        }catch(Exception e){
+                            System.err.println("Could not decrypt file: " + src);
+                            continue;
+                            
+                        }
 			Vector<String> keys = parseKeys(sb);
 			sb.delete(0, sb.length());
 
