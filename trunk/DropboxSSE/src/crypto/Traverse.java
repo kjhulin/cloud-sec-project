@@ -43,10 +43,10 @@ public class Traverse
 		if(f.isDirectory())
 		{	
                     //TODO: CHECK THIS!!
-                    traverse(f);
-//			File[] files = f.listFiles();
-//			for(File x : files)
-//				traverse(x);
+
+			File[] files = f.listFiles();
+			for(File x : files)
+				traverse(x);
 		}
 		else if(f.isFile() && Pattern.matches(regex, f.getName()))
 		{
