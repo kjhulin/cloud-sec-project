@@ -460,6 +460,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
         char[] searchKey = searchPasswordField.getPassword();
+        SSE2.setDB_Path(rootPath + userName );
         if (searchKey.length == 0) //is null
         {
             JOptionPane.showMessageDialog(this, "No password entered!");
@@ -470,7 +471,7 @@ public class MainWindow extends javax.swing.JFrame {
             try
             {
                 //String userPath = rootPath+ File.separator + userName;
-                String userPath = rootPath + userName + File.pathSeparatorChar;
+                String userPath = rootPath + userName + File.separator;
                 System.out.println("USER PATH: " + userPath);
 
                 crypto.SSE2.createDatabase(searchKey,userPath);
