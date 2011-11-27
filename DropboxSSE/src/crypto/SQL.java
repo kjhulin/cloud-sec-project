@@ -66,15 +66,19 @@ public class SQL
 		{
 			Class.forName(SQL_CLASS);
 		    conn = DriverManager.getConnection(SQL_FILE);
+                    System.out.println("QUERY = "+query.toString());
 		    PreparedStatement prep = conn.prepareStatement(query.toString());
 		    for(int i = 0; i < count; i++)
-		    {prep.setString((i+1), traps.get(i));}
+                        {prep.setString((i+1), traps.get(i));}
+            
 		    rs = prep.executeQuery();
 		    
 		    String path;
+
 		    while(rs.next())
 		    {
 		    	path = rs.getString("path");
+
 		    	paths.add(path);
 		    }
 		}
