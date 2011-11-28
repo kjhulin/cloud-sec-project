@@ -143,7 +143,7 @@ public class Crypto
 	 */
 	public static void fileAESdec(File src, File dest, final char[] pass) throws AlertException
 	{
-            System.out.println(Arrays.toString(pass));
+            System.out.println("filesaesdec pass = " + Arrays.toString(pass));
 		if(!verifyHMAC(src, pass.clone()))
 			throw new AlertException("fileAESdec: hmac verification failed");
 
@@ -441,6 +441,7 @@ public class Crypto
 	{
 		File source = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
+                System.out.println("keyaesdec pass = " + Arrays.toString(pass));
 
 		fileAESdec(source,temp,pass.clone());
 		Arrays.fill(pass, (char) 0);
