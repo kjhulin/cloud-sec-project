@@ -159,6 +159,7 @@ public class Crypto
 			file = new RandomAccessFile(src, "r");
 			channel = file.getChannel();
 			len = channel.size() - (SALT_SIZE + IV_SIZE + SALT_SIZE + HMAC_SIZE);
+                        
 			System.out.println(len);
                         channel.position((long)len);
 			buf = ByteBuffer.wrap(fKey);
@@ -193,16 +194,18 @@ public class Crypto
 			CipherInputStream is = new CipherInputStream(new FileInputStream(src), cipher);
 			FileOutputStream os = new FileOutputStream(dest);
 
-			byte[] buffer;
+			byte[] buffer = new byte[NUM_ROUNDS];;
 			//int size;
                         int numRead = 0;
 			while(len > 0)
 			{
 				//size = (int)((len >= NUM_ROUNDS) ? NUM_ROUNDS : len);
-				buffer = new byte[NUM_ROUNDS];
-				if((numRead = is.read(buffer)) >= 0)
+				
+				if((numRead = is.read(buffer,0,(int)len)) > 0)
                                 {
                                     os.write(buffer, 0, numRead);
+                                 
+                                    System.out.println(bytesToString(buffer,numRead));
                                     len -= numRead;
                                 }
 			}
@@ -212,7 +215,13 @@ public class Crypto
 		catch(Exception e)
 		{throw new AlertException("fileAESdec: unable to decrypt source to destination");}
 	}
-
+        public static String bytesToString(byte[] b,int t){
+            String ret = "";
+            for(int i = 0; i < t; i++){
+                ret += (char)b[i];
+            }
+            return ret;
+        }
 	/**
 	 * Crypto keygen method - generates secret key based on password
 	 * @param pass Character array that contains password used for password based encryption

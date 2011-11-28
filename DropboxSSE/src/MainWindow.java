@@ -31,12 +31,14 @@ import java.util.logging.Logger;
 import java.awt.Desktop;
 import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.table.*;
 import javax.swing.JTree;
 
@@ -579,7 +581,11 @@ public class MainWindow extends javax.swing.JFrame {
             //Create encrypted version of file in user SecDB directory
             File destination = new File(userLocation + File.separator+f.getName());
             Crypto.fileAESenc(f,destination, passwordField.getPassword().clone(),false);
-            String searchKey = JOptionPane.showInputDialog(this,"Enter the SSE Search password:","Search Password",0);
+            
+            String searchKey = showPasswordDialog("Enter the SSE Search password:");
+            System.out.println(Arrays.toString(searchKey.toCharArray()));
+            if(searchKey == null) return;
+            
             Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
             //Push encrypted file to dropbox
             pushFile(destination);
@@ -696,5 +702,16 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPasswordField searchPasswordField;
     private javax.swing.JTextField txtField_SearchForKey;
     // End of variables declaration//GEN-END:variables
+
+    private String showPasswordDialog(String string) {
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setEchoChar('*');
+        Object[] obj = {string, passwordField};
+        Object stringArray[] = {"OK","Cancel"};
+        if (JOptionPane.showOptionDialog(null, obj, "Need password",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, stringArray, obj) == JOptionPane.YES_OPTION)
+            return  new String(passwordField.getPassword());
+        return null;
+    }
 
 }
