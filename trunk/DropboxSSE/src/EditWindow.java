@@ -304,7 +304,11 @@ public class EditWindow extends javax.swing.JFrame {
             crypto.Crypto.fileAESdec(currentFile, saveAs, filePasswordField.getPassword());
             txtField_Browse.setText(saveAs.getAbsolutePath());
             if(jCheckBox1.isSelected()){
-                MainWindow.desktop.open(saveAs);
+                try{
+                    MainWindow.desktop.open(saveAs);
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(this, "Unable to open specified file.");
+                }
             }
         }catch(Exception e){e.printStackTrace();}
             
