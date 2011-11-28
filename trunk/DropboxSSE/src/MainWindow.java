@@ -534,13 +534,16 @@ public class MainWindow extends javax.swing.JFrame {
                 {
                     traps =
                             crypto.SSE2.trapdoor(searchingForModel.getElementAt(i).toString(), searchKey.clone());
-
-                    results.addAll(crypto.SSE2.search(traps, searchKey.clone()));
+                    for(String s : crypto.SSE2.search(traps, searchKey.clone())){
+                        
+                        results.add(searchingForModel.getElementAt(i).toString() + " :: " + s);
+                    }
+                    //results.addAll(crypto.SSE2.search(traps, searchKey.clone()));
                 }
                 //Return results here
                 for (int i = 0; i < results.size(); i++)
                 {
-                    resultsModel.addElement("\"\" found in: " + results.get(i));
+                    resultsModel.addElement(results.get(i));
                 }
 
                 crypto.SSE2.deleteDatabase(searchKey,userPath);
