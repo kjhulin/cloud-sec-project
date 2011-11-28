@@ -205,8 +205,6 @@ public class MainWindow extends javax.swing.JFrame {
         btn_EditFileKeywords = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtree = new javax.swing.JTree();
-        jLabel1 = new javax.swing.JLabel();
-        passwordField = new javax.swing.JPasswordField();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
         searchPasswordField = new javax.swing.JPasswordField();
@@ -254,8 +252,6 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(jtree);
-
-        jLabel1.setText("Add/Edit File PW:");
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -358,11 +354,7 @@ public class MainWindow extends javax.swing.JFrame {
                                             .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(147, 147, 147)
-                                .addComponent(jLabel4))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jLabel4)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -399,12 +391,7 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btn_AddFile)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -452,44 +439,16 @@ public class MainWindow extends javax.swing.JFrame {
             String selectedFileLocation = getUserPathFromTree();
             File editFile = new File(selectedFileLocation);
             if(editFile.isDirectory()){
-                JOptionPane.showMessageDialog(this,"Directory selected.  Please select a file.");
+                JOptionPane.showMessageDialog(this,"Directory selected. Please select a file.");
                 return;
             }
-            if (passwordField.getPassword().length == 0)
-            {
 
-                JOptionPane.showMessageDialog(null,"No password given");
-                return;
-            }
             else
             {
-                //send File and Given Search Password to crypto
-                try
-                {
-                    File SSEfile = new File(editFile.getAbsolutePath()+Crypto.EXT);
 
-                    if(!SSEfile.exists()){
-
-                        //String searchKey = JOptionPane.showInputDialog(this,"SSE File not found! Enter the SSE Search password to create it:","Search Password",0);
-                        //TODO: Verify searchKey against Database?
-                        JOptionPane.showMessageDialog(this,"SSE File not found! Generating search file from provided password\nTODO:Verifying Search Key (against DB?) here");
-                        Crypto.keyAESenc(editFile, passwordField.getPassword(), new StringBuilder(""));
-                        //Push encrypted file to dropbox
-                        pushFile(SSEfile);
-                    }
-
-                    if(!Crypto.verifyHMAC(SSEfile, passwordField.getPassword())){
-                        JOptionPane.showMessageDialog(this,"Invalid search password");
-                        return;
-                    }
-                    //Create SSEFile if it dosent exist
-
-                    //crypto.Crypto.keyAESdec(editFile, passwordField.getPassword());
-                    EditWindow ew = new EditWindow(editFile,passwordField.getPassword());
+                    EditWindow ew = new EditWindow(editFile);
                     ew.setVisible(true);
                     ew.setTitle(editFile.getAbsolutePath());
-
-                }catch (Exception ae){ae.printStackTrace();}
             }
         }
 
@@ -536,7 +495,7 @@ public class MainWindow extends javax.swing.JFrame {
                             crypto.SSE2.trapdoor(searchingForModel.getElementAt(i).toString(), searchKey.clone());
                     for(String s : crypto.SSE2.search(traps, searchKey.clone())){
                         
-                        results.add(searchingForModel.getElementAt(i).toString() + " :: " + s);
+                        results.add("\"" + searchingForModel.getElementAt(i).toString() + "\" found in: " + s);
                     }
                     //results.addAll(crypto.SSE2.search(traps, searchKey.clone()));
                 }
@@ -546,6 +505,11 @@ public class MainWindow extends javax.swing.JFrame {
                     resultsModel.addElement(results.get(i));
                 }
 
+                if (resultsModel.size() == 0)
+                {
+                    resultsModel.addElement("No results found");
+                }
+
                 crypto.SSE2.deleteDatabase(searchKey,userPath);
             }
             catch(Exception e){e.printStackTrace();}
@@ -553,10 +517,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_SearchActionPerformed
 
     private void btn_AddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddFileActionPerformed
-        if(passwordField.getPassword().length==0){
-            JOptionPane.showMessageDialog(this,"Enter a password for the file");
-            return;
-        }
+
         if(jtree.isSelectionEmpty()){//If nothing is selected, select root
             jtree.setSelectionInterval(0,0);
         }
@@ -579,11 +540,13 @@ public class MainWindow extends javax.swing.JFrame {
             return;
         }
         System.out.println(f.getAbsolutePath());
+        String password = "";
+        password = showPasswordDialog("Enter password to encrypt file with");
 
         try{
             //Create encrypted version of file in user SecDB directory
             File destination = new File(userLocation + File.separator+f.getName());
-            Crypto.fileAESenc(f,destination, passwordField.getPassword().clone(),false);
+            Crypto.fileAESenc(f,destination, password.toCharArray(),false);
             
             String searchKey = showPasswordDialog("Enter the SSE Search password:");
             System.out.println(Arrays.toString(searchKey.toCharArray()));
@@ -688,7 +651,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton btn_Search;
     private javax.swing.JButton btn_clearResults;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -701,7 +663,6 @@ public class MainWindow extends javax.swing.JFrame {
     public static javax.swing.JTree jtree;
     private javax.swing.JList list_Results;
     private javax.swing.JList list_SearchingFor;
-    private javax.swing.JPasswordField passwordField;
     private javax.swing.JPasswordField searchPasswordField;
     private javax.swing.JTextField txtField_SearchForKey;
     // End of variables declaration//GEN-END:variables
