@@ -45,7 +45,7 @@ public class Crypto
 	public final static String EXT = ".SSE2";
 	private final static String TEMP = ".TEMP";
 	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
-	
+
 	/**
 	 * Crypto fileAESenc method - encrypts file
 	 * If destination file exists HMAC verification occurs.
@@ -66,7 +66,7 @@ public class Crypto
 		{
 			if(!verifyHMAC(dest, pass.clone()))
 				throw new AlertException("fileAESenc: hmac verification failed");
-			
+
 			try
 			{
 				file = new RandomAccessFile(dest, "rw");
@@ -78,22 +78,22 @@ public class Crypto
 			catch(Exception e)
 			{throw new AlertException("fileAESenc: unable to clear file");}
 		}
-		
+
 		final byte[] fKey = generateBytes(SALT_SIZE);
 		final byte[] fIV = generateBytes(IV_SIZE);
 		final byte[] secret = keygen(pass.clone(), fKey, AES_KEY_SIZE);
 		SecretKeySpec keySpec = new SecretKeySpec(secret, "AES");
 		Arrays.fill(secret, (byte) 0x00);
-		
+
 		try
 		{
 			final Cipher cipher = Cipher.getInstance(AES_CIPHER_MODE);
 			IvParameterSpec ivSpec = new IvParameterSpec(fIV);
 			cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-			
+
 			FileInputStream is = new FileInputStream(src);
 			CipherOutputStream os = new CipherOutputStream(new FileOutputStream(dest,true), cipher);
-			
+
 			byte[] buffer = new byte[NUM_ROUNDS];
 			int numRead = 0;
 			while((numRead = is.read(buffer)) >= 0)
@@ -103,7 +103,7 @@ public class Crypto
 		}
                 catch(Exception e)
 		{throw new AlertException("fileAESenc: unable to encrypt source to destination");}
-		
+
 		try
 		{
 			file = new RandomAccessFile(dest, "rw");
@@ -115,21 +115,21 @@ public class Crypto
 			channel.write(buf);
 			channel.close();
 			file.close();
-			
+
 			appendHMAC(dest, pass);
 		}
 		catch(Exception e)
 		{throw new AlertException("fileAESenc: unable to append structure");}
-		
+
 		Arrays.fill(pass, (char) 0);
-		
+
 		if(delete == true)
 		{
 			if(!src.delete())
 				throw new AlertException("fileAESenc: unable to delete source file");
 		}
 	}
-	
+
 	/**
 	 * Crypto fileAESdec method - decrypts file
 	 * Firstly HMAC verification occurs.
@@ -146,11 +146,11 @@ public class Crypto
             System.out.println(Arrays.toString(pass));
 		if(!verifyHMAC(src, pass.clone()))
 			throw new AlertException("fileAESdec: hmac verification failed");
-		
+
 		final byte[] fKey = new byte[SALT_SIZE];
 		final byte[] fIV = new byte[IV_SIZE];
 		long len = 0;
-		
+
 		RandomAccessFile file;
 		FileChannel channel;
 		ByteBuffer buf;
@@ -162,7 +162,7 @@ public class Crypto
 			System.out.println(len);
                         channel.position((long)len);
 			buf = ByteBuffer.wrap(fKey);
-                        
+
 			channel.read(buf);
 			buf = ByteBuffer.wrap(fIV);
 			channel.read(buf);
@@ -171,37 +171,40 @@ public class Crypto
 		}
 		catch(Exception e)
 		{e.printStackTrace();throw new AlertException("fileAESdec: unable to parse structure");}
-		
+
 		if(dest.exists())
 		{
 			if(!dest.delete())
 				throw new AlertException("fileAESdec: unable to delete destination");
 		}
-		
+
 		final byte[] secret = keygen(pass.clone(), fKey, AES_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
-		
+
 		SecretKeySpec keySpec = new SecretKeySpec(secret, "AES");
 		Arrays.fill(secret, (byte) 0x00);
-		
+
 		try
 		{
 			final Cipher cipher = Cipher.getInstance(AES_CIPHER_MODE);
 			IvParameterSpec ivSpec = new IvParameterSpec(fIV);
 			cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-			
+
 			CipherInputStream is = new CipherInputStream(new FileInputStream(src), cipher);
 			FileOutputStream os = new FileOutputStream(dest);
-			
+
 			byte[] buffer;
-			int size;
+			//int size;
+                        int numRead = 0;
 			while(len > 0)
 			{
-				size = (int)((len >= NUM_ROUNDS) ? NUM_ROUNDS : len);
-				buffer = new byte[size];
-				is.read(buffer);
-				os.write(buffer);
-				len -= size;
+				//size = (int)((len >= NUM_ROUNDS) ? NUM_ROUNDS : len);
+				buffer = new byte[NUM_ROUNDS];
+				if((numRead = is.read(buffer)) >= 0)
+                                {
+                                    os.write(buffer, 0, numRead);
+                                    len -= numRead;
+                                }
 			}
 			is.close();
 			os.close();
@@ -209,7 +212,7 @@ public class Crypto
 		catch(Exception e)
 		{throw new AlertException("fileAESdec: unable to decrypt source to destination");}
 	}
-	
+
 	/**
 	 * Crypto keygen method - generates secret key based on password
 	 * @param pass Character array that contains password used for password based encryption
@@ -222,31 +225,31 @@ public class Crypto
 	{
 		final int len = Math.abs(size / BIT_SIZE);
 		final byte[] result = new byte[len];
-		
+
 		final MessageDigest md;
 		try
 		{
 			md = MessageDigest.getInstance(SHA256_MODE);
 			md.reset();
 			md.update(salt);
-			
+
 			final byte[] bytes = convertChars(pass);
 			Arrays.fill(pass, (char) 0);
 			byte[] secret = md.digest(bytes);
 			Arrays.fill(bytes, (byte) 0x00);
-			
+
 			for(int i = 0; i < NUM_ROUNDS; i++)
 			{secret = md.digest(secret);}
-			
+
 			System.arraycopy(secret, 0, result, 0, result.length);
 			Arrays.fill(secret, (byte) 0x00);
 		}
 		catch(Exception e)
 		{throw new AlertException("keygen: unable to generate secret key");}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Crypto appendHMAC method - calculates and appends HMAC to encrypted file
 	 * Generates secret key using provided password.
@@ -259,20 +262,20 @@ public class Crypto
 	private static void appendHMAC(File src, final char[] pass) throws AlertException
 	{
 		final byte[] salt = generateBytes(SALT_SIZE);
-		
+
 		byte[] secret = keygen(pass, salt, HMAC_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
-		
+
 		SecretKeySpec key = new SecretKeySpec(secret, HMAC_MODE);
 		Arrays.fill(secret, (byte) 0x00);
-		
+
 		byte[] value = new byte[HMAC_SIZE];
 		try
 		{
 			InputStream is = new FileInputStream(src);
 			Mac mac = Mac.getInstance(HMAC_MODE);
 			mac.init(key);
-			
+
 			byte[] buffer;
 			int size;
 			int len = (int)(src.length() - (SALT_SIZE + IV_SIZE));
@@ -289,7 +292,7 @@ public class Crypto
 		}
 		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to calculate hmac");}
-		
+
 		RandomAccessFile file;
 		FileChannel channel;
 		ByteBuffer buf;
@@ -308,7 +311,7 @@ public class Crypto
 		catch(Exception e)
 		{throw new AlertException("appendHMAC: unable to append structure");}
 	}
-	
+
 	/**
 	 * Crypto verifyHMAC method - verifies the HMAC for file
 	 * Parses the source file for encrypted contents and HMAC.
@@ -343,20 +346,20 @@ public class Crypto
 		}
 		catch(Exception e)
 		{e.printStackTrace();throw new AlertException("verifyHMAC: unable to parse structure");}
-		
+
 		final byte[] secret = keygen(pass, salt, HMAC_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
-		
+
 		SecretKeySpec key = new SecretKeySpec(secret, HMAC_MODE);
 		Arrays.fill(secret, (byte) 0x00);
-		
+
 		byte[] value = new byte[HMAC_SIZE];
 		try
 		{
 			InputStream is = new FileInputStream(src);
 			Mac mac = Mac.getInstance(HMAC_MODE);
 			mac.init(key);
-			
+
 			byte[] buffer;
 			int size;
 			len = len - (SALT_SIZE + IV_SIZE + SALT_SIZE + HMAC_SIZE);
@@ -373,10 +376,10 @@ public class Crypto
 		}
 		catch(Exception e)
 		{throw new AlertException("verifyHMAC: unable to calcuate hmac");}
-		
+
 		return Arrays.equals(value, hmac);
 	}
-	
+
 	/**
 	 * Crypto keyAESenc - encrypts keyword file
 	 * First a regular expression is used to test the StringBuilder structure for a comma separated list.
@@ -392,10 +395,10 @@ public class Crypto
 	{
 		File dest = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
-		
+
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
-		
+
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
@@ -403,17 +406,17 @@ public class Crypto
 				writer.write(str.charAt(i));
 			writer.flush();
 			writer.close();
-                        
+
 		}
 		catch(Exception e)
 		{throw new AlertException("keyAESenc: unable to create temp file");}
-		
+
 		fileAESenc(temp,dest,pass.clone(),true);
-		
+
 		Arrays.fill(pass, (char) 0);
 		str.delete(0, str.length());
 	}
-	
+
 	/**
 	 * Crypto keyAESdec - decrypts keyword file
 	 * First fileAESdec is called to decrypt the contents to a temporary file.
@@ -429,10 +432,10 @@ public class Crypto
 	{
 		File source = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
-		
+
 		fileAESdec(source,temp,pass.clone());
 		Arrays.fill(pass, (char) 0);
-		
+
 		StringBuilder str = new StringBuilder();
 		try
 		{
@@ -441,7 +444,7 @@ public class Crypto
 			while((ch = reader.read()) != -1)
 				str.append((char)ch);
 			reader.close();
-			
+
 			if(!temp.delete())
 				throw new AlertException("keyAESdec: unable to delete temp file");
 		}
@@ -450,10 +453,10 @@ public class Crypto
 		System.out.println("keyword list: " + str);
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
-		
+
 		return str;
 	}
-	
+
 	/**
 	 * Crypto delete method - deletes the encrypted data and keyword files
 	 * First HMAC verification occurs.
@@ -469,17 +472,17 @@ public class Crypto
 		if(!verifyHMAC(src,pass.clone()))
 			throw new AlertException("delete: hmac verification failed");
 		Arrays.fill(pass, (char) 0);
-		
+
 		File dest = new File(src.getAbsolutePath() + EXT);
-		
+
 		if(!src.delete())
 			throw new AlertException("delete: unable to delete source file");
 		if(!dest.delete())
 			throw new AlertException("delete: unable to delete key file");
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Crypto move method - moves the encrypted data and keyword files
 	 * First HMAC verification occurs.
@@ -496,18 +499,18 @@ public class Crypto
 		if(!verifyHMAC(src,pass.clone()))
 			throw new AlertException("move: hmac verification failed");
 		Arrays.fill(pass, (char) 0);
-		
+
 		File in = new File(src.getAbsolutePath() + EXT);
 		File out = new File(dest.getAbsolutePath() + EXT);
-		
+
 		if(!src.renameTo(dest))
 			throw new AlertException("move: unable to move source file");
 		if(!in.renameTo(out))
 			throw new AlertException("move: unable to move key file");
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Crypto main method - used for example test cases
 	 * @param args no arguments should be supplied or required
@@ -517,47 +520,47 @@ public class Crypto
 	{
 		File cleartext = new File("cleartext.txt");
 		File ciphertext = new File("ciphertext.txt");
-		
+
 		String pw = "This is an extremely long generic key 0123456789 !@#$%^&*(){}|:\"<>?,./;'[]\'";
 		char[] pass = pw.toCharArray();
-		
+
 		char[] password = pass.clone();
 		fileAESenc(cleartext, ciphertext, password, true);
-		
+
 		password = pass.clone();
 		boolean verify = verifyHMAC(ciphertext, password);
 		System.out.println("verifyHMAC: " + verify);
-		
+
 		password = pass.clone();
 		fileAESdec(ciphertext, cleartext, password);
-		
+
 		StringBuilder str = new StringBuilder("apple");
 		str.append("");
 		keyAESenc(ciphertext,pass.clone(),str);
-		
+
 		str.delete(0, str.length());
 		str = keyAESdec(ciphertext,pass.clone());
-		
+
 		System.out.println(str.toString());
-		
+
 		File move = new File("move.txt");
 		verify = move(ciphertext,move,pass.clone());
 		System.out.println("MOVE: " + verify);
-		
+
 //		verify = delete(move, pass.clone());
 //		System.out.println("DELETE: " + verify);
-		
+
 		byte[] bytes = new byte[pass.length];
 		for(int i = 0; i < pass.length; i++)
 			bytes[i] = (byte) pass[i];
-		
+
 		System.out.println(toHexString(bytes));
 		System.out.println(toHexString(new String(pass).getBytes()));
 		System.out.println(new String(bytes));
 		System.out.println(new String(pass));
 		System.out.println(pass.length + " " + pw.getBytes().length + " " + pw.length());
 	}
-	
+
 	// BEGIN HELPER METHODS - BELOW THIS LINE
 	/**
 	 * Crypto convertChars method
@@ -630,18 +633,18 @@ public class Crypto
 		byte[] bytes = new byte[len / 2];
 		for(int i = 0; i < len; i += 2)
 		{
-			bytes[i / 2] = (byte) ((Character.digit(str.charAt(i), 16) << 4) 
+			bytes[i / 2] = (byte) ((Character.digit(str.charAt(i), 16) << 4)
 								+ Character.digit(str.charAt(i+1), 16));
 		}
 		return bytes;
 	}
 	// END HELPER METHODS - ABOVE THIS LINE
 
-        
+
         /**
          * Overwrites a file's contents with null bytes 10 times before deleting
          * @param openFrom
-         * @throws IOException 
+         * @throws IOException
          */
     public static void secureDelete(File openFrom) throws IOException {
         for(int t = 0; t < 10; t++){
@@ -652,6 +655,6 @@ public class Crypto
             fw.close();
         }
         openFrom.delete();
-        
+
     }
 }
