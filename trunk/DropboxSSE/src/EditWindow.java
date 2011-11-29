@@ -377,7 +377,7 @@ public class EditWindow extends javax.swing.JFrame {
                 keywordsModel.addElement(fileKeys.elementAt(i));
             }
         }
-        catch(Exception e){JOptionPane.showMessageDialog(null, "Wrong password given"); return;}
+        catch(Exception e){e.printStackTrace();JOptionPane.showMessageDialog(null, "Wrong password given"); return;}
     }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
 
     
