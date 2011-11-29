@@ -1,4 +1,5 @@
 package crypto;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -45,6 +47,7 @@ public class Crypto
 	public final static String EXT = ".SSE2";
 	private final static String TEMP = ".TEMP";
 	private final static String regex = "^([A-Za-z]+)?(,[A-Za-z]+)*$";
+        public final static String passHash = ".search";
 
 	/**
 	 * Crypto fileAESenc method - encrypts file
@@ -402,12 +405,34 @@ public class Crypto
 	 */
 	public static void keyAESenc(File src, final char[] pass, final StringBuilder str) throws AlertException
 	{
+            
+            File rootPath = src.getParentFile();
+            try{
+                while(!Arrays.asList(rootPath.list()).contains(".meta")){
+                    rootPath = rootPath.getParentFile();
+                    System.out.println(rootPath.getAbsolutePath());
+                }
+            }catch(Exception e){throw new AlertException("keyAESenc: no .meta file found");}
 		File dest = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
 
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
-
+                File t = new File(rootPath + File.separator + passHash);
+                System.out.println(t.getAbsolutePath());
+                if(!t.exists()){//Create search password file
+                    try{
+                        File tmp = new File(".secret.tmp");
+                        FileWriter fw = new FileWriter(tmp);
+                        fw.write("Never gonna give you up, never gonna let you down, never gonna run around and desert you!");
+                        fw.close();
+                        fileAESenc(tmp,t,pass,true);
+                        
+                    }catch(Exception e){e.printStackTrace();throw new AlertException("keyAESenc: Unable to create .search");}
+                }
+                else if(!verifyHMAC(t,pass)){
+                    throw new AlertException("keyAESenc: wrong password");
+                }
 		try
 		{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(temp));
