@@ -426,11 +426,11 @@ public class Crypto
                         FileWriter fw = new FileWriter(tmp);
                         fw.write("Never gonna give you up, never gonna let you down, never gonna run around and desert you!");
                         fw.close();
-                        fileAESenc(tmp,t,pass,true);
+                        fileAESenc(tmp,t,pass.clone(),true);
                         
                     }catch(Exception e){e.printStackTrace();throw new AlertException("keyAESenc: Unable to create .search");}
                 }
-                else if(!verifyHMAC(t,pass)){
+                else if(!verifyHMAC(t,pass.clone())){
                     throw new AlertException("keyAESenc: wrong password");
                 }
 		try
