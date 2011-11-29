@@ -216,9 +216,12 @@ public class AuthWindow extends javax.swing.JFrame {
                         BufferedInputStream(new FileInputStream(tkc.username.toString()+File.separator+".meta")));
                 MainWindow.meta =  (HashMap<String,Date>)ois.readObject();
                 ois.close();
+                MainWindow.updateMeta(null,null);
+                
                 //System.out.println(MainWindow.meta);
             }else{
                 MainWindow.meta = new HashMap<String,Date>();
+                MainWindow.updateMeta(null, null);
             }
         }
         else
@@ -226,9 +229,15 @@ public class AuthWindow extends javax.swing.JFrame {
             //create that folder
             userFolder.mkdir();
             MainWindow.meta = new HashMap<String,Date>();
+            MainWindow.updateMeta(null, null);
         }
         currentUserPath = userFolder.getAbsolutePath();
         obtainFiles(userFolder);
+        
+        System.out.println("Meta file contents: " );
+        for(String s : MainWindow.meta.keySet()){
+            System.out.println(s + " :: " + MainWindow.meta.get(s).toString());
+        }
         //point Jtree at folder
         MainWindow.jtree.setVisible(false);
         FileTreeModel model = new FileTreeModel(userFolder);
@@ -236,6 +245,8 @@ public class AuthWindow extends javax.swing.JFrame {
         MainWindow.jtree.setVisible(true);
 
         this.setVisible(false);
+        
+        
         }catch(Exception e){e.printStackTrace();}
 
     }//GEN-LAST:event_btn_confirmActionPerformed
@@ -256,13 +267,15 @@ public class AuthWindow extends javax.swing.JFrame {
         try{
 
             //upath == user path
-
+            ArrayList<String> files = new ArrayList<String>();
             for(Entry e : listDirectory(s)){
 
                 if(e.isDir){
+                    
                     //System.out.println("e.fileName() == " + e.fileName());
                     //System.out.println("eParentPath: "+e.parentPath());
                     File path = new File(uPath.toString() + File.separator + e.fileName());
+                    files.add(path.getAbsolutePath());
                     //System.out.println("PATH: "+path.getAbsolutePath().toString());
                     if(!path.exists()){
                         path.mkdir();
@@ -272,11 +285,14 @@ public class AuthWindow extends javax.swing.JFrame {
                    // System.out.println("e.fileName() == " + e.fileName());
                     //System.out.println("PARENT PATH: " + e.parentPath());
 
-                    File downloadPath = new File(uPath.toString() + File.separator + e.fileName());
+                    File downloadPath = new File(uPath.getAbsolutePath() + File.separator + e.fileName());
                     Date dateModified = df.parse(e.modified);
                     //System.out.println("date modified: " + dateModified.toString());
                     //System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
                     String dbPath = e.parentPath()+e.fileName();
+                    System.out.println(dbPath);
+                    System.out.println(downloadPath.getAbsolutePath());
+                    files.add(downloadPath.getAbsolutePath());
                     if(!MainWindow.meta.containsKey(dbPath) 
                             || !new File(downloadPath.toString()).exists() 
                             || dateModified.after(MainWindow.meta.get(dbPath))){
@@ -287,9 +303,20 @@ public class AuthWindow extends javax.swing.JFrame {
                     }
                 }
             }
+            removeDeleted(uPath, files);
         }catch(Exception e){e.printStackTrace();}
     }
-
+    public static void removeDeleted(File f,ArrayList<String> a){
+        for(File c : f.listFiles()){
+            if(c.isDirectory()){
+                removeDeleted(c,a);
+            }
+            if(!c.getName().equals(".meta")&&!c.getName().equals(".search")&&!a.contains(c.getAbsolutePath())){
+                c.delete();
+                System.out.println("Deleted : " + c.getAbsolutePath());
+            }
+        } 
+    }
     public static  List<Entry> listDirectory(String path) throws Exception{
        //System.out.println("list path:" + path);
        Entry entry = MainWindow.DAPI.metadata(path, 0, null, true, null);
@@ -321,12 +348,15 @@ public class AuthWindow extends javax.swing.JFrame {
                         BufferedInputStream(new FileInputStream(MainWindow.userName.toString()+File.separator+".meta")));
                 MainWindow.meta =  (HashMap<String,Date>)ois.readObject();
                 ois.close();
+                MainWindow.updateMeta(null, null);
                 }catch(Exception e){
                     System.err.println("Error reading .meta -- recreating");
                     MainWindow.meta = new HashMap<String,Date>();
+                    MainWindow.updateMeta(null, null);
                 }
             }else{
                 MainWindow.meta = new HashMap<String,Date>();
+                MainWindow.updateMeta(null, null);
             }
         }
         else
@@ -334,6 +364,7 @@ public class AuthWindow extends javax.swing.JFrame {
             //create that folder
             userFolder.mkdir();
             MainWindow.meta = new HashMap<String,Date>();
+            MainWindow.updateMeta(null,null);
         }
 
         currentUserPath = userFolder.getAbsolutePath();
@@ -402,7 +433,8 @@ class FileTreeModel implements TreeModel {
 
         public boolean accept(File file, String string) {
             return !string.startsWith(".") && ! string.endsWith(Crypto.EXT) 
-                    && !string.equals("SSE2.DB") && !string.equals("SSE2.DB.EXT");
+                    && !string.equals("SSE2.DB") && !string.equals("SSE2.DB.EXT")
+                    && !string.equals(Crypto.passHash);
         }
     };
   // We specify the root directory when we create the model.
