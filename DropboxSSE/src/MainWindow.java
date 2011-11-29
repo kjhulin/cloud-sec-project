@@ -10,6 +10,7 @@ import com.dropbox.client2.session.RequestTokenPair;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 
+import crypto.AlertException;
 import crypto.Crypto;
 import crypto.SSE2;
 import java.io.BufferedInputStream;
@@ -84,6 +85,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     //Map dropbox string path + dateMod
     public static void updateMeta(String filePath, Date mod){
+        System.out.println("UPDATE META");
         if(mod == null){
             if(meta.containsKey(filePath)){
                 meta.remove(filePath);
@@ -123,13 +125,17 @@ public class MainWindow extends javax.swing.JFrame {
     public static FilenameFilter ffilter = new FilenameFilter() {
                 public boolean accept(File file, String string) {
                     System.out.println(string);
-                    return !string.endsWith(Crypto.EXT);
+                    return !string.endsWith(Crypto.EXT) && !string.equals(Crypto.passHash) 
+                            && !string.equals(".meta") && !string.equals("SSE2.DB")
+                            && !string.equals("SSE2.DB.EXT");
                 }
             };
     public static void deleteFile(File f, boolean force) throws Exception{
         
         System.out.println("file path: " + f.getAbsolutePath());
-        System.out.println("rootPath: " + rootPath.replace("\\","\\\\")+userName);
+        String root = rootPath.replace("\\","\\\\")+userName;
+        System.out.println("rootPath: " + root);
+
         if(f.isDirectory()){
             if(!force){
                 Object[] options = { "OK", "CANCEL" };
@@ -146,15 +152,20 @@ public class MainWindow extends javax.swing.JFrame {
                 deleteFile(ff,true);    
             }
             System.out.println("Deleting file: " + f.getName());
-            f.delete();
-            if(f.exists()){
-                refreshTree();
-                JOptionPane.showMessageDialog(null,"Could not delete all of directory contents.  Are some files open by other programs?");
+            if(!f.getAbsolutePath().equals(rootPath + userName)){
+                f.delete();
+                if(f.exists()){
+                    refreshTree();
+
+                    JOptionPane.showMessageDialog(null,"Could not delete all of directory contents.  Are some files open by other programs?");
+                }
+                String fname = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
+                try{
+
+                    DAPI.delete(fname);
+                    updateMeta(fname,null);
+                }catch(Exception e){System.out.println("Could not delete DB: " + fname);}
             }
-            String fname = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\", "/");
-            try{
-                DAPI.delete(fname);
-            }catch(Exception e){System.out.println("Could not delete DB: " + fname);}
             refreshTree();
             
         }else{
@@ -534,7 +545,7 @@ public class MainWindow extends javax.swing.JFrame {
         JFileChooser jfc = new JFileChooser("");
         jfc.showOpenDialog(this);
         File f = jfc.getSelectedFile();
-
+        
         if(f == null){
             System.err.println("Did not choose a file");
             return;
@@ -546,21 +557,31 @@ public class MainWindow extends javax.swing.JFrame {
         try{
             //Create encrypted version of file in user SecDB directory
             File destination = new File(userLocation + File.separator+f.getName());
-            Crypto.fileAESenc(f,destination, password.toCharArray(),false);
+            if(destination.exists()){
+                JOptionPane.showMessageDialog(this,"A file with that name already exists.  Delete the current one or rename the file");
+                return;
+            }
+            
+            
             
             String searchKey = showPasswordDialog("Enter the SSE Search password:");
             System.out.println(Arrays.toString(searchKey.toCharArray()));
             if(searchKey == null) return;
-            
-            Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
+            try{
+                Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
+            }catch(AlertException e){JOptionPane.showMessageDialog(this, "Wrong search password");return;}
+            Crypto.fileAESenc(f,destination, password.toCharArray(),false);
             //Push encrypted file to dropbox
             pushFile(destination);
             File searchFile = new File(userLocation + File.separator + f.getName() + Crypto.EXT);
             System.out.println(searchFile.getAbsolutePath());
             pushFile(searchFile);
             refreshTree();
-
-        }catch(Exception e){System.err.println("Error encrypting and pushing file"); e.printStackTrace();}
+            try{
+                pushFile(new File(userLocation + File.separator + Crypto.passHash));
+            }catch(Exception e){}
+            
+        }catch(Exception e){System.err.println("Error encrypting and pushing file"); }
     }//GEN-LAST:event_btn_AddFileActionPerformed
 
     private void btn_RemoveSearchKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RemoveSearchKeyActionPerformed
