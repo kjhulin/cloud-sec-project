@@ -49,7 +49,7 @@ import javax.swing.tree.TreePath;
 
 public class AuthWindow extends javax.swing.JFrame {
 
-    public File tokensFile = new File("auth.dat");
+    public static File tokensFile = new File("auth.dat");
     public boolean isAuthed = false;
     static public WebAuthSession authWAS;
     public RequestTokenPair rtp;
@@ -60,7 +60,7 @@ public class AuthWindow extends javax.swing.JFrame {
     /** Creates new form AuthWindow */
     public AuthWindow() {
         initComponents();
-        
+        lbl_currentUser.setText("No User Detected");
         if(tokensFile.exists())
         {
             try
@@ -116,7 +116,6 @@ public class AuthWindow extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         lbl_currentUser = new javax.swing.JLabel();
-        btn_logOut = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         btn_confirm = new javax.swing.JButton();
         btn_Continue = new javax.swing.JButton();
@@ -126,13 +125,6 @@ public class AuthWindow extends javax.swing.JFrame {
         jLabel1.setText("Currently Logged In As:");
 
         lbl_currentUser.setText("NO USER DETECTED");
-
-        btn_logOut.setText("Log Out");
-        btn_logOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_logOutActionPerformed(evt);
-            }
-        });
 
         btn_confirm.setText("Confirm Log In");
         btn_confirm.addActionListener(new java.awt.event.ActionListener() {
@@ -156,19 +148,18 @@ public class AuthWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btn_logOut, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btn_confirm, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lbl_currentUser))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btn_Continue, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)))
+                        .addComponent(btn_Continue, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btn_confirm, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -180,13 +171,11 @@ public class AuthWindow extends javax.swing.JFrame {
                     .addComponent(lbl_currentUser))
                 .addGap(18, 18, 18)
                 .addComponent(btn_Continue)
-                .addGap(34, 34, 34)
-                .addComponent(btn_logOut)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_confirm)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -325,13 +314,6 @@ public class AuthWindow extends javax.swing.JFrame {
        }
 
 
-    private void btn_logOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logOutActionPerformed
-        // TODO add your handling code here:
-
-        tokensFile.delete();
-        lbl_currentUser.setText("NO USER DETECTED (log out occurred)");
-    }//GEN-LAST:event_btn_logOutActionPerformed
-
     private void btn_ContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ContinueActionPerformed
         // TODO add your handling code here:
         
@@ -391,10 +373,9 @@ public class AuthWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Continue;
     private javax.swing.JButton btn_confirm;
-    private javax.swing.JButton btn_logOut;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JLabel lbl_currentUser;
+    public javax.swing.JLabel lbl_currentUser;
     // End of variables declaration//GEN-END:variables
 
 }
