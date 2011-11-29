@@ -329,41 +329,45 @@ public class EditWindow extends javax.swing.JFrame {
      * @param evt 
      */
     private void btn_RevealKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RevealKeywordsActionPerformed
+              
+        if (gaveCorrectPassword == false)
+        {
+            JPasswordField passwordField = new JPasswordField();
+            passwordField.setEchoChar('*');
+            Object[] obj = {"Enter file's search password", passwordField};
+            Object stringArray[] = {"OK","Cancel"};
+            if (JOptionPane.showOptionDialog(null, obj, "Need password",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, stringArray, obj) == JOptionPane.YES_OPTION)
+            {
+                password = passwordField.getPassword();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null, "Please enter a password");
+                return;
+            }
+        }
+
         try
         {
-            if (gaveCorrectPassword == false)
-            {
-                JPasswordField passwordField = new JPasswordField();
-                passwordField.setEchoChar('*');
-                Object[] obj = {"Enter file's search password", passwordField};
-                Object stringArray[] = {"OK","Cancel"};
-                if (JOptionPane.showOptionDialog(null, obj, "Need password",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, stringArray, obj) == JOptionPane.YES_OPTION)
-                {
-                    password = passwordField.getPassword();
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(null, "Please enter a password");
-                    return;
-                }
+            File SSEfile = new File(currentFile.getAbsolutePath()+Crypto.EXT);
+
+            if(!SSEfile.exists()){
+
+                //String searchKey = JOptionPane.showInputDialog(this,"SSE File not found! Enter the SSE Search password to create it:","Search Password",0);
+                //TODO: Verify searchKey against Database?
+                JOptionPane.showMessageDialog(this,"SSE File not found! Generating search file from provided password\nTODO:Verifying Search Key (against DB?) here");
+                Crypto.keyAESenc(currentFile, password, new StringBuilder(""));
+
+                //Push encrypted file to dropbox
+                MainWindow.pushFile(SSEfile);
+                gaveCorrectPassword = true;
+                JOptionPane.showMessageDialog(this, "SSE File not found.  Creating a new one.");
+
             }
+        }catch(Exception e){System.err.println("Error creating SSE file"); return;}
 
-            try
-            {
-                File SSEfile = new File(currentFile.getAbsolutePath()+Crypto.EXT);
-
-                if(!SSEfile.exists()){
-
-                    //String searchKey = JOptionPane.showInputDialog(this,"SSE File not found! Enter the SSE Search password to create it:","Search Password",0);
-                    //TODO: Verify searchKey against Database?
-                    JOptionPane.showMessageDialog(this,"SSE File not found! Generating search file from provided password\nTODO:Verifying Search Key (against DB?) here");
-                    Crypto.keyAESenc(currentFile, password, new StringBuilder(""));
-                    //Push encrypted file to dropbox
-                    MainWindow.pushFile(SSEfile);
-                }
-            }catch (Exception ae){JOptionPane.showMessageDialog(null, "Wrong password given"); return;}
-
+        try{
             StringBuilder sb = crypto.Crypto.keyAESdec(currentFile, password.clone());
             Vector<String> fileKeys = crypto.SSE2.parseKeys(sb);
             gaveCorrectPassword = true; //gets here if keyAESdec doesn't throw exception
@@ -408,6 +412,8 @@ public class EditWindow extends javax.swing.JFrame {
             System.out.println(sb.toString());
             System.out.println(Arrays.toString(password));
             Crypto.keyAESenc(currentFile, password.clone(), sb);
+            
+            MainWindow.pushFile(new File(currentFile+Crypto.EXT));
             
         }
         catch(Exception e){e.printStackTrace();}
