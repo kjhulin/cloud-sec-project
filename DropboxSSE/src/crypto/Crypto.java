@@ -162,7 +162,7 @@ public class Crypto
 			file = new RandomAccessFile(src, "r");
 			channel = file.getChannel();
 			len = channel.size() - (SALT_SIZE + IV_SIZE + SALT_SIZE + HMAC_SIZE);
-                        
+
 			System.out.println(len);
                         channel.position((long)len);
 			buf = ByteBuffer.wrap(fKey);
@@ -174,7 +174,7 @@ public class Crypto
 			file.close();
 		}
 		catch(Exception e)
-		{e.printStackTrace();throw new AlertException("fileAESdec: unable to parse structure");}
+		{throw new AlertException("fileAESdec: unable to parse structure");}
 
 		if(dest.exists())
 		{
@@ -203,12 +203,12 @@ public class Crypto
 			while(len > 0)
 			{
 				//size = (int)((len >= NUM_ROUNDS) ? NUM_ROUNDS : len);
-				
+
 				if((numRead = is.read(buffer,0,(int)len)) > 0)
                                 {
                                     os.write(buffer, 0, numRead);
-                                 
-                                    System.out.println(bytesToString(buffer,numRead));
+
+                                    //System.out.println(bytesToString(buffer,numRead));
                                     len -= numRead;
                                 }
 			}
@@ -357,7 +357,7 @@ public class Crypto
 			file.close();
 		}
 		catch(Exception e)
-		{e.printStackTrace();throw new AlertException("verifyHMAC: unable to parse structure");}
+		{throw new AlertException("verifyHMAC: unable to parse structure");}
 
 		final byte[] secret = keygen(pass, salt, HMAC_KEY_SIZE);
 		Arrays.fill(pass, (char) 0);
@@ -405,7 +405,7 @@ public class Crypto
 	 */
 	public static void keyAESenc(File src, final char[] pass, final StringBuilder str) throws AlertException
 	{
-            
+
             File rootPath = src.getParentFile();
             try{
                 while(!Arrays.asList(rootPath.list()).contains(".meta")){
@@ -427,8 +427,8 @@ public class Crypto
                         fw.write("Never gonna give you up, never gonna let you down, never gonna run around and desert you!");
                         fw.close();
                         fileAESenc(tmp,t,pass.clone(),true);
-                        
-                    }catch(Exception e){e.printStackTrace();throw new AlertException("keyAESenc: Unable to create .search");}
+
+                    }catch(Exception e){throw new AlertException("keyAESenc: Unable to create .search");}
                 }
                 else if(!verifyHMAC(t,pass.clone())){
                     throw new AlertException("keyAESenc: wrong password");

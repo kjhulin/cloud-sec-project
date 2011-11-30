@@ -14,9 +14,9 @@ public class Traverse
 {
 	/**Regular expression to match file extension*/
 	private final static String regex = "^.*(.SSE2){1,1}$";
-	/**Original File object*/ 
+	/**Original File object*/
 	private File file;
-	
+
 	/**
 	 * Traverse constructor
 	 * @param file File object that points to original source
@@ -30,7 +30,7 @@ public class Traverse
 	 */
 	public void start() throws AlertException
 	{traverse(file);}
-	
+
 	/**
 	 * Traverse traverse method - recursive method
 	 * If directory, retrieve file listing and make recursive call
@@ -41,9 +41,7 @@ public class Traverse
 	public void traverse(File f) throws AlertException
 	{
 		if(f.isDirectory())
-		{	
-                    //TODO: CHECK THIS!!
-
+                {
 			File[] files = f.listFiles();
 			for(File x : files)
 				traverse(x);
@@ -52,7 +50,7 @@ public class Traverse
 		{
 			String path = f.getAbsolutePath();
 			path = path.substring(0, path.length() - 5);
-			
+
 			if(!SQL.setDocumentID(path))
 				throw new AlertException("traverse: unable to insert path");
 		}
