@@ -157,7 +157,7 @@ public class SSE2
 			is.close();
 		}
 		catch(Exception e)
-		{e.printStackTrace();throw new AlertException("appendHMAC: unable to calculate hmac");}
+		{throw new AlertException("appendHMAC: unable to calculate hmac");}
 
 		RandomAccessFile file;
 		FileChannel channel;
@@ -294,7 +294,7 @@ public class SSE2
                         }catch(Exception e){
                             System.err.println("Could not decrypt file: " + src);
                             continue;
-                            
+
                         }
 			Vector<String> keys = parseKeys(sb);
 			sb.delete(0, sb.length());

@@ -43,7 +43,7 @@ public class EditWindow extends javax.swing.JFrame {
         initComponents();
         currentFile = passedFile;
         //sseFile = new File(currentFile.getAbsoluteFile()+Crypto.EXT);
-        
+
         keywordsModel = new DefaultListModel();
         list_Keywords.setModel(keywordsModel);
 
@@ -293,7 +293,7 @@ public class EditWindow extends javax.swing.JFrame {
             System.out.println("Save location: " + saveAs.getAbsolutePath());
             if(saveAs.exists()){
                 Object[] options = { "OK", "CANCEL" };
-                int t = JOptionPane.showOptionDialog(null, "Warning! " + saveAs.getName() 
+                int t = JOptionPane.showOptionDialog(null, "Warning! " + saveAs.getName()
                             + " already exists!  This action will overwrite it.  Continue?", "Warning",
                             JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
                             null, options, options[1]);
@@ -310,7 +310,7 @@ public class EditWindow extends javax.swing.JFrame {
                 }
             }
         }catch(Exception e){e.printStackTrace();}
-            
+
     }//GEN-LAST:event_btn_DecryptActionPerformed
 
     private void btn_BrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_BrowseActionPerformed
@@ -323,13 +323,13 @@ public class EditWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btn_BrowseActionPerformed
 
-    
+
     /**
      * Reverts to keyword list stored in SSE file
-     * @param evt 
+     * @param evt
      */
     private void btn_RevealKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_RevealKeywordsActionPerformed
-              
+
         if (gaveCorrectPassword == false)
         {
             JPasswordField passwordField = new JPasswordField();
@@ -380,10 +380,10 @@ public class EditWindow extends javax.swing.JFrame {
         catch(Exception e){e.printStackTrace();JOptionPane.showMessageDialog(null, "Wrong password given"); return;}
     }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
 
-    
+
     /**
-     * Saves keywords list to SSE file 
-     * @param evt 
+     * Saves keywords list to SSE file
+     * @param evt
      */
     private void btn_SaveKeywordsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SaveKeywordsActionPerformed
         if (gaveCorrectPassword == false)
@@ -400,7 +400,7 @@ public class EditWindow extends javax.swing.JFrame {
 //                JOptionPane.showMessageDialog(this, "No keywords entered!");
 //                return;
 //            }
-            
+
             StringBuilder sb = new StringBuilder("");
             String s;
             Enumeration<String> words = (Enumeration<String>) keywordsModel.elements();
@@ -412,9 +412,9 @@ public class EditWindow extends javax.swing.JFrame {
             System.out.println(sb.toString());
             System.out.println(Arrays.toString(password));
             Crypto.keyAESenc(currentFile, password.clone(), sb);
-            
+
             MainWindow.pushFile(new File(currentFile+Crypto.EXT));
-            
+
         }
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_SaveKeywordsActionPerformed
@@ -426,16 +426,16 @@ public class EditWindow extends javax.swing.JFrame {
     private void btn_ReplaceFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ReplaceFileActionPerformed
         try
         {
-            
+
             if(filePasswordField.getPassword().length==0){
                 JOptionPane.showMessageDialog(this, "Enter the file password!");
                 return;
             }
             if(!Crypto.verifyHMAC(currentFile, filePasswordField.getPassword().clone())){
-               JOptionPane.showMessageDialog(this, "Wrong password!"); 
+               JOptionPane.showMessageDialog(this, "Wrong password!");
                return;
             }
-            
+
            if(txtField_Browse.getText().length()==0){
                 JOptionPane.showMessageDialog(this,"Select a location from which load the plaintext file!");
                 btn_BrowseActionPerformed(evt);
@@ -446,14 +446,14 @@ public class EditWindow extends javax.swing.JFrame {
                 return;
             }
             //delete original file from dropbox
-            MainWindow.deleteFile(currentFile,false);
-            
+            //MainWindow.deleteFile(currentFile,false);
+
             //push new file  to dropbox
-            
+
             crypto.Crypto.fileAESenc(openFrom, currentFile, filePasswordField.getPassword(), true); //true means we always delete original
 
             //push new file with new keywords to dropbox
-            MainWindow.pushFile(currentFile); 
+            MainWindow.pushFile(currentFile);
             JOptionPane.showMessageDialog(this, "File saved!");
             if(jCheckBox2.isSelected()){
                 Crypto.secureDelete(openFrom);
