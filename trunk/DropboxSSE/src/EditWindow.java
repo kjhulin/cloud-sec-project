@@ -291,7 +291,7 @@ public class EditWindow extends javax.swing.JFrame {
             if(saveAs == null){
                 return;
             }
-            System.out.println("Save location: " + saveAs.getAbsolutePath());
+            //System.out.println("Save location: " + saveAs.getAbsolutePath());
             if(saveAs.exists()){
                 Object[] options = { "OK", "CANCEL" };
                 int t = JOptionPane.showOptionDialog(null, "Warning! " + saveAs.getName()
@@ -410,13 +410,13 @@ public class EditWindow extends javax.swing.JFrame {
                 sb.append(words.nextElement());
                 if(words.hasMoreElements())sb.append(",");
             }
-            System.out.println(currentFile.getAbsolutePath());
-            System.out.println(sb.toString());
-            System.out.println(Arrays.toString(password));
+            //System.out.println(currentFile.getAbsolutePath());
+            //System.out.println(sb.toString());
+            //System.out.println(Arrays.toString(password));
             Crypto.keyAESenc(currentFile, password.clone(), sb);
 
             MainWindow.pushFile(new File(currentFile+Crypto.EXT));
-
+            JOptionPane.showMessageDialog(null, "Keywords saved!");
         }
         catch(Exception e){e.printStackTrace();}
     }//GEN-LAST:event_btn_SaveKeywordsActionPerformed
@@ -482,7 +482,8 @@ public class EditWindow extends javax.swing.JFrame {
         String newKeyword = txtField_newKeyword.getText();
         if(newKeyword.length() == 0)
         {
-            System.out.println("no keyword entered");
+            //System.out.println("no keyword entered");
+            JOptionPane.showMessageDialog(this,"Enter a keyword to add");
         }
         else
         {
@@ -491,7 +492,8 @@ public class EditWindow extends javax.swing.JFrame {
                 return;
             }
             txtField_newKeyword.setText("");
-            keywordsModel.addElement(newKeyword);
+            if(!keywordsModel.contains(newKeyword))
+                keywordsModel.addElement(newKeyword);
         }
     }//GEN-LAST:event_btn_AddKeywordActionPerformed
 
@@ -503,7 +505,7 @@ public class EditWindow extends javax.swing.JFrame {
         }
         else
         {
-            System.out.println("Please select keyword to delete");
+            JOptionPane.showMessageDialog(null,"Please select keyword to delete");
         }
 
     }//GEN-LAST:event_btn_DeleteKeywordActionPerformed

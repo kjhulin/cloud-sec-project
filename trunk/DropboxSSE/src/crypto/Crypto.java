@@ -146,7 +146,7 @@ public class Crypto
 	 */
 	public static void fileAESdec(File src, File dest, final char[] pass) throws AlertException
 	{
-            System.out.println("filesaesdec pass = " + Arrays.toString(pass));
+            //System.out.println("filesaesdec pass = " + Arrays.toString(pass));
 		if(!verifyHMAC(src, pass.clone()))
 			throw new AlertException("fileAESdec: hmac verification failed");
 
@@ -163,7 +163,7 @@ public class Crypto
 			channel = file.getChannel();
 			len = channel.size() - (SALT_SIZE + IV_SIZE + SALT_SIZE + HMAC_SIZE);
 
-			System.out.println(len);
+			//System.out.println(len);
                         channel.position((long)len);
 			buf = ByteBuffer.wrap(fKey);
 
@@ -346,7 +346,7 @@ public class Crypto
 		{
 			file = new RandomAccessFile(src, "rw");
 			channel = file.getChannel();
-                        System.out.println(channel);
+                        //System.out.println(channel);
 			len = (int) channel.size();
 			channel.position((long)(len - (SALT_SIZE + HMAC_SIZE)));
 			buf = ByteBuffer.wrap(salt);
@@ -410,7 +410,7 @@ public class Crypto
             try{
                 while(!Arrays.asList(rootPath.list()).contains(".meta")){
                     rootPath = rootPath.getParentFile();
-                    System.out.println(rootPath.getAbsolutePath());
+                    //System.out.println(rootPath.getAbsolutePath());
                 }
             }catch(Exception e){throw new AlertException("keyAESenc: no .meta file found");}
 		File dest = new File(src.getAbsolutePath() + EXT);
@@ -419,7 +419,7 @@ public class Crypto
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
                 File t = new File(rootPath + File.separator + passHash);
-                System.out.println(t.getAbsolutePath());
+                //System.out.println(t.getAbsolutePath());
                 if(!t.exists()){//Create search password file
                     try{
                         File tmp = new File(".secret.tmp");
@@ -466,7 +466,7 @@ public class Crypto
 	{
 		File source = new File(src.getAbsolutePath() + EXT);
 		File temp = new File(src.getAbsolutePath() + TEMP);
-                System.out.println("keyaesdec pass = " + Arrays.toString(pass));
+                //System.out.println("keyaesdec pass = " + Arrays.toString(pass));
 
 		fileAESdec(source,temp,pass.clone());
 		Arrays.fill(pass, (char) 0);
@@ -485,7 +485,7 @@ public class Crypto
 		}
 		catch(Exception e)
 		{throw new AlertException("keyAESdec: unable to create list");}
-		System.out.println("keyword list: " + str);
+		//System.out.println("keyword list: " + str);
 		if(!Pattern.matches(regex, str))
 			throw new AlertException("keyAESenc: regex failed");
 
