@@ -77,11 +77,6 @@ public class MainWindow extends javax.swing.JFrame {
         resultsModel = new DefaultListModel();
         list_SearchingFor.setModel(searchingForModel);
         list_Results.setModel(resultsModel);
-
-        AuthWindow aw = new AuthWindow();
-        aw.setVisible(true);
-
-
     }
     //Map dropbox string path + dateMod
     public static void updateMeta(String filePath, Date mod){
@@ -684,6 +679,11 @@ public class MainWindow extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainWindow().setVisible(true);
+
+                AuthWindow aw = new AuthWindow();
+                aw.setVisible(true);
+
+
                 jtree.setVisible(false);
             }
         });
