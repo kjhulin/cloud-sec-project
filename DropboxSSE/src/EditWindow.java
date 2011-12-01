@@ -278,7 +278,8 @@ public class EditWindow extends javax.swing.JFrame {
                 return;
             }
             if(!Crypto.verifyHMAC(currentFile, filePasswordField.getPassword())){
-                JOptionPane.showMessageDialog(this,"Wrong password!");
+                JOptionPane.showMessageDialog(this,"Cannot verify this file's HMAC." +
+                        " Either the file has been altered or the given password is incorrect.");
                 return;
             }
             if(txtField_DecryptBrowse.getText().length()==0){
@@ -377,7 +378,8 @@ public class EditWindow extends javax.swing.JFrame {
                 keywordsModel.addElement(fileKeys.elementAt(i));
             }
         }
-        catch(Exception e){e.printStackTrace();JOptionPane.showMessageDialog(null, "Wrong password given"); return;}
+        catch(Exception e){e.printStackTrace();JOptionPane.showMessageDialog(null, "Cannot verify this file's keywords." +
+                "Either the keyword file has been altered or the given password is incorrect."); return;}
     }//GEN-LAST:event_btn_RevealKeywordsActionPerformed
 
 
@@ -432,7 +434,8 @@ public class EditWindow extends javax.swing.JFrame {
                 return;
             }
             if(!Crypto.verifyHMAC(currentFile, filePasswordField.getPassword().clone())){
-               JOptionPane.showMessageDialog(this, "Wrong password!");
+               JOptionPane.showMessageDialog(this, "Cannot verify this file's HMAC." +
+                        " Either the file has been altered or the given password is incorrect.");
                return;
             }
 
