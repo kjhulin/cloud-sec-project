@@ -141,7 +141,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     //Map dropbox string path + dateMod
     public static void updateMeta(String filePath, Date mod){
-        System.out.println("UPDATE META");
+        //System.out.println("UPDATE META");
         if(mod == null){
             if(meta.containsKey(filePath)){
                 meta.remove(filePath);
@@ -150,8 +150,8 @@ public class MainWindow extends javax.swing.JFrame {
             meta.put(filePath, mod);
         }
         try{ //Update meta file
-            System.out.println(filePath + " -- " + mod);
-            System.out.println("Updating meta file " + userName + File.separator+".meta");
+           // System.out.println(filePath + " -- " + mod);
+           // System.out.println("Updating meta file " + userName + File.separator+".meta");
             ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(userName + File.separator+".meta")));
             oos.writeObject(meta);
             oos.close();
@@ -165,7 +165,7 @@ public class MainWindow extends javax.swing.JFrame {
         String dbPath = f.getAbsolutePath().replaceFirst(rootPath.replace("\\","\\\\")+userName, "").replace("\\","/");
 
         //String dbPath = getDBPathFromTree();
-        System.out.println("Pusing file " + f.getAbsolutePath() + " to dbpath: " + dbPath);
+        //System.out.println("Pusing file " + f.getAbsolutePath() + " to dbpath: " + dbPath);
         if(f.isDirectory()){
             return DAPI.createFolder(dbPath);
         }else{
@@ -180,7 +180,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     public static FilenameFilter ffilter = new FilenameFilter() {
                 public boolean accept(File file, String string) {
-                    System.out.println(string);
+                    //System.out.println(string);
                     return !string.endsWith(Crypto.EXT) && !string.equals(Crypto.passHash) 
                             && !string.equals(".meta") && !string.equals("SSE2.DB")
                             && !string.equals("SSE2.DB.EXT");
@@ -188,9 +188,9 @@ public class MainWindow extends javax.swing.JFrame {
             };
     public static void deleteFile(File f, boolean force) throws Exception{
         
-        System.out.println("file path: " + f.getAbsolutePath());
+        //System.out.println("file path: " + f.getAbsolutePath());
         String root = rootPath.replace("\\","\\\\")+userName;
-        System.out.println("rootPath: " + root);
+        //System.out.println("rootPath: " + root);
 
         if(f.isDirectory()){
             if(!force){
@@ -204,10 +204,10 @@ public class MainWindow extends javax.swing.JFrame {
             }
             
             for(File ff : f.listFiles(ffilter)){
-                System.out.println("folder contents: " + ff.getName());
+                //System.out.println("folder contents: " + ff.getName());
                 deleteFile(ff,true);    
             }
-            System.out.println("Deleting file: " + f.getName());
+            //System.out.println("Deleting file: " + f.getName());
             if(!f.getAbsolutePath().equals(rootPath + userName)){
                 f.delete();
                 if(f.exists()){
@@ -564,7 +564,7 @@ public class MainWindow extends javax.swing.JFrame {
             {
                 //String userPath = rootPath+ File.separator + userName;
                 String userPath = rootPath + userName + File.separator;
-                System.out.println("USER PATH: " + userPath);
+                //System.out.println("USER PATH: " + userPath);
 
                 crypto.SSE2.createDatabase(searchKey.clone());
                 File userRootPath = new File(userPath);
@@ -610,8 +610,8 @@ public class MainWindow extends javax.swing.JFrame {
 
         String userLocation = getUserPathFromTree();
         String DBLocation = getDBPathFromTree();
-        System.out.println("file's local location = " + userLocation);
-        System.out.println("dropboxAddPath = "+ DBLocation);
+        //System.out.println("file's local location = " + userLocation);
+        //System.out.println("dropboxAddPath = "+ DBLocation);
 
 
         JFileChooser jfc = new JFileChooser("");
@@ -622,7 +622,7 @@ public class MainWindow extends javax.swing.JFrame {
             System.err.println("Did not choose a file");
             return;
         }
-        System.out.println(f.getAbsolutePath());
+        //System.out.println(f.getAbsolutePath());
         String password = "";
         password = showPasswordDialog("Enter password to encrypt file with");
 
@@ -637,7 +637,7 @@ public class MainWindow extends javax.swing.JFrame {
             
             
             String searchKey = showPasswordDialog("Enter the SSE Search password:");
-            System.out.println(Arrays.toString(searchKey.toCharArray()));
+            //System.out.println(Arrays.toString(searchKey.toCharArray()));
             if(searchKey == null) return;
             try{
                 Crypto.keyAESenc(destination, searchKey.toCharArray(), new StringBuilder(""));
@@ -646,7 +646,7 @@ public class MainWindow extends javax.swing.JFrame {
             //Push encrypted file to dropbox
             pushFile(destination);
             File searchFile = new File(userLocation + File.separator + f.getName() + Crypto.EXT);
-            System.out.println(searchFile.getAbsolutePath());
+            //System.out.println(searchFile.getAbsolutePath());
             pushFile(searchFile);
             refreshTree();
             try{
@@ -672,8 +672,8 @@ public class MainWindow extends javax.swing.JFrame {
     private void jtreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jtreeValueChanged
         // TODO add your handling code here:
         if(jtree != null && jtree.getSelectionPath()!= null){
-            System.out.println("User Path: " + getUserPathFromTree());
-            System.out.println("DB Path: " + getDBPathFromTree());
+            //System.out.println("User Path: " + getUserPathFromTree());
+            //System.out.println("DB Path: " + getDBPathFromTree());
         }
     }//GEN-LAST:event_jtreeValueChanged
     /**

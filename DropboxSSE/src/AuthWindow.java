@@ -216,10 +216,6 @@ public class AuthWindow extends javax.swing.JFrame {
         currentUserPath = userFolder.getAbsolutePath();
         obtainFiles(userFolder);
         
-        System.out.println("Meta file contents: " );
-        for(String s : MainWindow.meta.keySet()){
-            System.out.println(s + " :: " + MainWindow.meta.get(s).toString());
-        }
         //point Jtree at folder
         MainWindow.jtree.setVisible(false);
         FileTreeModel model = new FileTreeModel(userFolder);
@@ -272,8 +268,8 @@ public class AuthWindow extends javax.swing.JFrame {
                     //System.out.println("date modified: " + dateModified.toString());
                     //System.out.println("DOWNLOAD PATH: " + downloadPath.getAbsolutePath().toString());
                     String dbPath = e.parentPath()+e.fileName();
-                    System.out.println(dbPath);
-                    System.out.println(downloadPath.getAbsolutePath());
+                    //System.out.println(dbPath);
+                    //System.out.println(downloadPath.getAbsolutePath());
                     files.add(downloadPath.getAbsolutePath());
                     if(!MainWindow.meta.containsKey(dbPath) 
                             || !new File(downloadPath.toString()).exists() 
