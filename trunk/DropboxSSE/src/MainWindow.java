@@ -658,7 +658,11 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void btn_logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_logoutActionPerformed
 
-        AuthWindow.tokensFile.delete();
+        try
+        {
+            Crypto.secureDelete(AuthWindow.tokensFile);
+        }catch(Exception e){JOptionPane.showMessageDialog(null, "Error occured while attempting to delete user's dropbox tokens file." +
+                " Your credentials may still be stored on this machine!");
         System.exit(0);
     }//GEN-LAST:event_btn_logoutActionPerformed
 

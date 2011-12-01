@@ -47,11 +47,12 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 
+
 public class AuthWindow extends javax.swing.JFrame {
 
-    public static File tokensFile = new File("auth.dat");
+    public static File tokensFile = new File("auth.dat"); //stores user's dropbox information
     public boolean isAuthed = false;
-    static public WebAuthSession authWAS;
+    static public WebAuthSession authWAS; 
     public RequestTokenPair rtp;
     public static AuthWindow aw;
     public static String currentUserPath;
